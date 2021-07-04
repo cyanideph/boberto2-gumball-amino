@@ -291,18 +291,12 @@ def wiki(data):
         data.subClient.send_message(data.chatId, esteticabase("Disambuiguição", f"""[c]{may_referir_a}""", 
         f"{data.message} pode se referir a: "))
         return False
-    wpr = (wp.content).split(".")
+    wpr = (wp.content).split("\n")
     
     # Manda a primeira linha btw
-    data.subClient.send_message(data.chatId, esteticabase(data.message, f"""[c]{wpr[0]}.{wpr[1]}.
+    data.subClient.send_message(data.chatId, esteticabase(data.message, f"""[c]{wpr[0]}
 
 [c]Mais informação em: {wp.url}""", f"Sumário de {data.message}"))
-
-
-# !kill
-@client.command("kill")
-def murder(data):
-    return None
 
 client.launch()
 print("pronto")
