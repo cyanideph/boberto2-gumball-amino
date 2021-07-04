@@ -286,20 +286,23 @@ def wiki(data):
     try:
         wp = wikipedia.page(data.message)
     except wikipedia.exceptions.DisambiguationError as e:
+        # Se cair em uma página de disambiguation, é printado erro
         may_referir_a = '\n'.join(e.options)
-        data.subClient.send_message(data.chatId, f"""
-Pode se referir a:
-
-{may_referir_a}        
-        """)
+        data.subClient.send_message(data.chatId, esteticabase("Disambuiguição", f"""[c]{may_referir_a}""", 
+        f"{data.message} pode se referir a: "))
         return False
     wpr = (wp.content).split(".")
     
     # Manda a primeira linha btw
-    data.subClient.send_message(data.chatId, f"""{wpr[0]}.{wpr[1]}.
+    data.subClient.send_message(data.chatId, esteticabase(data.message, f"""[c]{wpr[0]}.{wpr[1]}.
 
-Mais informação em: {wp.url}""")
+[c]Mais informação em: {wp.url}""", f"Sumário de {data.message}"))
 
+
+# !kill
+@client.command("kill")
+def murder(data):
+    return None
 
 client.launch()
 print("pronto")
