@@ -49,6 +49,8 @@ def ajuda(data):
 [c]!vsfbot - Manda o bot se fuder
 [c]!kid [texto] - fAz O tExtO fIcAr AsSiM
 [c]!sorteio [tipo; arumentos] - Sorteia coisas, para ver os tipos digite !help sorrteios
+[c]!wiki [coisa] - Procura algo na wikipédia e manda o resultado
+[c]!quote [Pessoa, frase]- Cita uma frase 
         """, "Página 1"))
     elif data.message == "sorteios":
         data.subClient.send_message(data.chatId, esteticabase("help", """
@@ -287,7 +289,7 @@ def wiki(data):
         wp = wikipedia.page(data.message)
     except wikipedia.exceptions.DisambiguationError as e:
         # Se cair em uma página de disambiguation, é printado erro
-        may_referir_a = '\n'.join(e.options)
+        may_referir_a = '\n[c]'.join(e.options)
         data.subClient.send_message(data.chatId, esteticabase("Disambuiguição", f"""[c]{may_referir_a}""", 
         f"{data.message} pode se referir a: "))
         return False
@@ -297,6 +299,19 @@ def wiki(data):
     data.subClient.send_message(data.chatId, esteticabase(data.message, f"""[c]{wpr[0]}
 
 [c]Mais informação em: {wp.url}""", f"Sumário de {data.message}"))
+
+
+# !quote
+@client.command("quote")
+def fala(data):
+    args = (data.message).split(" ")
+    if args[0] == 'r':
+        args[0] = choice(["Ednaldo Pereira", "Gumball Watterson", "Darwin Watterson", "Felipe Neto", "Diggo", "Juilo Caesar"
+               , "Aristoceles", "Isaac Newton", "Albert Einsten", "Joseph Stalin", "Vladmir Putin", "Karl Marx"
+               , "Vladmir Lenin", "Jesus Cristo", "Mark Zuckerberg", "Bill Gates", "Steve Jobs", "Autor Desconhecido",
+               "Dom Pedro II do Brasil", "Dom Pedro I do Brasil", "Pitagoras", "Galileu Galileu", "Pedro"
+               , "Stephen Hawking"])
+    data.subClient.send_message(data.chatId, f"[cui]{' '.join(args[1:])} ~{args[0]}")
 
 client.launch()
 print("pronto")
