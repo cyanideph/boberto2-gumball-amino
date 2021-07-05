@@ -214,7 +214,7 @@ def cancel(data):
 'gosta do Felipe Neto', "não gosta de Gumball", "é o Neymar", "é gado para caralho", "é lindo dms", "gosta de Kpop", 
 "não fez nada", "é comunista", "apoia o anarcocapitalismo", "apoia o narcotráfico", "被中共黑了", "é chato pra krl",
 "odeia cachorros", "assiste boku no hero", "não gosta do Felipe Neto", "dbdzkfhgvkdhf", "é hacker", 
-"gosta do bts", "não gosta do bts", "falou que gosta de gumwin", "é shitposter", "assiste tio orochi", "usa windows",
+"gosta do bts", "não gosta do bts", "falou que gosta de gumwin", "é shitposter", "assiste tio orochi", "usa windows", "usa linux",
 "apoia o comunismo", "apoia o monarquismo", "come figado de frango", "eu quero mijar"])}."""))
 
 
@@ -312,6 +312,31 @@ def fala(data):
                "Dom Pedro II do Brasil", "Dom Pedro I do Brasil", "Pitagoras", "Galileu Galileu", "Pedro"
                , "Stephen Hawking"])
     data.subClient.send_message(data.chatId, f"[cui]{' '.join(args[1:])} ~{args[0]}")
+
+
+# !8ball (Inspirado na Kotomi)
+@client.command("8ball")
+def kotomi_8ball(data):
+    data.subClient.send_message(data.chatId, choice(["Não", "Sim", "Claro que não", 
+    "Claro que sim", "Não KKKK lol xD", "Talvez, quem sabe?", "será?", 
+    "Nunca", "Isso se quer é uma pergunta?", "Nem fudendo", "Óbvio",
+    "MAS É CLARO", "Uhum", "Lógico que não '-'", "Lógico", "Talvez sim, talvez não."]))
+
+
+# !compatibilidade
+@client.command("compatibilidade")
+def kotomi_compatibilidad(data):
+    # Porcentagem de compatiblidade
+    porcentagem = float(f"{uniform(0, 100):.2f}")
+    resto = 100 - porcentagem
+
+    data.subClient.send_message(data.chatId, esteticabase("Compatibilidade", f"""
+[c] As chances de {data.author} e {data.message} combinarem são de {porcentagem}%
+[c]
+[c][{"█"*int(porcentagem/5)}{"⠀"*int(resto/5)}]
+    """, 
+    f"{data.message} x {data.author}"))
+
 
 client.launch()
 print("pronto")
