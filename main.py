@@ -324,6 +324,18 @@ def fala(data):
 # !8ball (Inspirado na Kotomi)
 @client.command("8ball")
 def kotomi_8ball(data):
+    
+    # Bloqueia algumas palavras chaves
+    blocklist = ["nazi", "nazista", "nazismo", "homofobia", "homofóbico", "racismo", 
+    "racista", "fascista", "fascismo", "n4z1st4", "n4z1sm0", "n4z1"]
+    for l in ((data.message).replace("?", "")).split(" "):
+        if l.lower() in blocklist:
+            
+            # Fala que não vai responder caso alguma palavra esteja na lista de palavras chaves
+            data.subClient.send_message(data.chatId, "Não vou responder a isso.")
+            return False
+
+    # Manda a resposta
     data.subClient.send_message(data.chatId, choice(["Não", "Sim", "Claro que não", 
     "Claro que sim", "Não KKKK lol xD", "Talvez, quem sabe?", "será?", 
     "Nunca", "Isso se quer é uma pergunta?", "Nem fudendo", "Óbvio",
