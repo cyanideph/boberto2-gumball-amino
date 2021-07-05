@@ -303,9 +303,9 @@ def wiki(data):
     wpr = (wp.content).split("\n")
     
     # Manda a primeira linha btw
-    data.subClient.send_message(data.chatId, esteticabase(data.message, f"""[c]{wpr[0]}
+    data.subClient.send_message(data.chatId, esteticabase(wp.title, f"""[c]{wpr[0]}
 
-[c]Mais informação em: {wp.url}""", f"Sumário de {data.message}"))
+[c]Mais informação em: {wp.url}""", f"Sumário de {wp.title}"))
 
 
 # !quote
@@ -345,5 +345,6 @@ def kotomi_compatibilidad(data):
     f"{data.message} x {data.author}"))
 
 
+# 
 client.launch()
 print("pronto")
