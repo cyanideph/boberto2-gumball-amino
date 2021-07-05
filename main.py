@@ -52,12 +52,19 @@ def ajuda(data):
 [c]!wiki [coisa] - Procura algo na wikipédia e manda o resultado
 [c]!quote [Pessoa, frase]- Cita uma frase 
         """, "Página 1"))
+    elif data.message == "2":
+        data.subClient.send_message(data.chatId, esteticabase("help", """
+[c] !8ball [Pergunta] - Responde sua pergunta com sim ou não
+[c] !compatibilidade [pessoa] - Checa sua compatibilidade
+        """, "Página 2"))
     elif data.message == "sorteios":
         data.subClient.send_message(data.chatId, esteticabase("help", """
 [c]Tipos de sorteios:
 [c]     n - Sorteia um número. Argumentos: Numéro inicial, número final
 [c]     p - Sorteia nomes. Argumentos: nomes (não possui limites)
         """, "Sorteios"))
+    else:
+        data.subClient.send_message(data.chatId, "Digite o número da página. (Total de páginas: 2)")
 
 
 # Comando !ship
