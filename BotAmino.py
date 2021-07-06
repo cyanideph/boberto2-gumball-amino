@@ -10,6 +10,7 @@ from random import choice
 from datetime import datetime
 from amino import Client, SubClient, ACM
 from uuid import uuid4
+from os import system
 # this is the Slimakoi's API with some of my patches
 
 # API made by ThePhoenix78
@@ -469,8 +470,18 @@ class BotAmino(Command, Client, TimeOut, BannedWords):
                 args.message = ' '.join(args.message.split()[1:])
                 self.time_user(args.authorId, self.wait)
                 if command.lower() in self.commands["command"].keys():
+                    
+                    # Essa parte do código foi escrita por Jake
+                    # Ela cuida da parte da pontuação
+                    system(f"python3 scripts/ranking.py {args.authorId}")
+                    pontuação = int(''.join(open(f"pontos/{args.authorId}", "r").readlines()))
+                    if pontuação % 1000 == 0:
+                        # Notifica se o autor consegiu uma milestone
+                        subClient.send_message(args.chatId, f"[bc]Parabéns {args.author} pelos {pontuação} pontos!")
+                    
+                    # Isso aqui foi o phoenix
                     Thread(target=self.execute, args=[command, args]).start()
-
+                    
                 elif self.no_command_message:
                     subClient.send_message(args.chatId, self.no_command_message)
                 return

@@ -5,6 +5,7 @@ from time import *
 from gtts import gTTS, lang
 import os
 import wikipedia
+import json
 
 print("Iniciando...")
 
@@ -327,7 +328,8 @@ def kotomi_8ball(data):
     
     # Bloqueia algumas palavras chaves
     blocklist = ["nazi", "nazista", "nazismo", "homofobia", "homofóbico", "racismo", 
-    "racista", "fascista", "fascismo", "n4z1st4", "n4z1sm0", "n4z1"]
+    "racista", "fascista", "fascismo", "n4z1st4", "n4z1sm0", "n4z1", "preconceito", 
+    "preconceituoso", "xenofobia", "xenofobico", "xenofóbico", "homofobico"]
     for l in ((data.message).replace("?", "")).split(" "):
         if l.lower() in blocklist:
             
@@ -357,6 +359,22 @@ def kotomi_compatibilidad(data):
     f"{data.message} x {data.author}"))
 
 
-# 
+# Isso aqui é só pra testar, ignorar
+@client.command("teste")
+def teste(data):
+    if data.message == "0":
+        os.system("python3 scripts/filewriter.py")
+        data.subClient.send_message(data.chatId, str(''.join(open("scripts/file", "r").readlines())))
+
+
+# !pontos
+@client.command("pontos")
+def points(data):
+    # Olha a quantidades de pontos
+    pontos = ''.join(open(f"pontos/{data.authorId}", "r").readlines())
+    
+    data.subClient.send_message(data.chatId, pontos)
+
+
 client.launch()
 print("pronto")
