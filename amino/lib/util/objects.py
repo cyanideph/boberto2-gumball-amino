@@ -1,6 +1,11 @@
 # You don't even know how long this shit took...
 # F*ck you Sand for making me do this.
 
+class Objects:
+    class Users:
+        team_amino = "000000000-0000-0000-0000-000000000000"
+        news_feed = "000000000-0000-0000-0000-000000000001"
+
 class UserProfile:
     def __init__(self, data):
         self.json = data
@@ -83,6 +88,11 @@ class UserProfile:
         self.warningCount = None
         self.totalQuizHighestScore = None
         self.totalQuizPlayedTimes = None
+        self.requestId = None
+        self.message = None
+        self.applicant = None
+        self.avgDailySpendTimeIn7Days = None
+        self.adminLogCountIn7Days = None
 
     @property
     def UserProfile(self):
@@ -236,6 +246,16 @@ class UserProfile:
         except (KeyError, TypeError): pass
         try: self.totalQuizPlayedTimes = self.json["totalQuizPlayedTimes"]
         except (KeyError, TypeError): pass
+        try: self.requestId = self.json["requestId"]
+        except (KeyError, TypeError): pass
+        try: self.message = self.json["message"]
+        except (KeyError, TypeError): pass
+        try: self.applicant = self.json["applicant"]
+        except (KeyError, TypeError): pass
+        try: self.avgDailySpendTimeIn7Days = self.json["avgDailySpendTimeIn7Days"]
+        except (KeyError, TypeError): pass
+        try: self.adminLogCountIn7Days = self.json["adminLogCountIn7Days"]
+        except (KeyError, TypeError): pass
 
         return self
 
@@ -325,6 +345,11 @@ class UserProfileList:
         self.warningCount = []
         self.totalQuizPlayedTimes = []
         self.totalQuizHighestScore = []
+        self.requestId = []
+        self.message = []
+        self.applicant = []
+        self.avgDailySpendTimeIn7Days = []
+        self.adminLogCountIn7Days = []
 
     @property
     def UserProfileList(self):
@@ -479,6 +504,16 @@ class UserProfileList:
             except (KeyError, TypeError): self.totalQuizPlayedTimes.append(None)
             try: self.totalQuizHighestScore.append(x["totalQuizHighestScore"])
             except (KeyError, TypeError): self.totalQuizHighestScore.append(None)
+            try: self.requestId.append(x["requestId"])
+            except (KeyError, TypeError): self.requestId.append(None)
+            try: self.message.append(x["message"])
+            except (KeyError, TypeError): self.message.append(None)
+            try: self.applicant.append(x["applicant"])
+            except (KeyError, TypeError): self.applicant.append(None)
+            try: self.avgDailySpendTimeIn7Days.append(x["avgDailySpendTimeIn7Days"])
+            except (KeyError, TypeError): self.avgDailySpendTimeIn7Days.append(None)
+            try: self.adminLogCountIn7Days.append(x["adminLogCountIn7Days"])
+            except (KeyError, TypeError): self.adminLogCountIn7Days.append(None)
 
         return self
 
@@ -539,6 +574,7 @@ class BlogList:
         self.quizTotalQuestionCount = []
         self.quizTrendingTimes = []
         self.quizLastAddQuestionTime = []
+        self.isIntroPost = []
 
     @property
     def BlogList(self):
@@ -623,6 +659,8 @@ class BlogList:
             except (KeyError, TypeError): self.quizTrendingTimes.append(None)
             try: self.quizLastAddQuestionTime.append(x["extensions"]["quizLastAddQuestionTime"])
             except (KeyError, TypeError): self.quizLastAddQuestionTime.append(None)
+            try: self.isIntroPost.append(x["extensions"]["isIntroPost"])
+            except (KeyError, TypeError): self.isIntroPost.append(None)
 
         return self
 
@@ -735,6 +773,7 @@ class Blog:
         self.quizTotalQuestionCount = None
         self.quizTrendingTimes = None
         self.quizLastAddQuestionTime = None
+        self.isIntroPost = None
 
     @property
     def Blog(self):
@@ -819,6 +858,8 @@ class Blog:
         try: self.quizTrendingTimes = self.json["extensions"]["quizTrendingTimes"]
         except (KeyError, TypeError): pass
         try: self.quizLastAddQuestionTime = self.json["extensions"]["quizLastAddQuestionTime"]
+        except (KeyError, TypeError): pass
+        try: self.isIntroPost = self.json["extensions"]["isIntroPost"]
         except (KeyError, TypeError): pass
 
         return self
@@ -2011,6 +2052,8 @@ class Thread:
         self.screeningRoomHostId = None
         self.screeningRoomPermission = None
         self.disabledTime = None
+        self.organizerTransferCreatedTime = None
+        self.organizerTransferId = None
 
     @property
     def Thread(self):
@@ -2027,6 +2070,8 @@ class Thread:
         try: self.isPinned = self.json["isPinned"]
         except (KeyError, TypeError): pass
         try: self.title = self.json["title"]
+        except (KeyError, TypeError): pass
+        try: self.membershipStatus = self.json["membershipStatus"]
         except (KeyError, TypeError): pass
         try: self.content = self.json["content"]
         except (KeyError, TypeError): pass
@@ -2092,6 +2137,10 @@ class Thread:
         except (KeyError, TypeError): pass
         try: self.screeningRoomPermission = self.json["extensions"]["screeningRoomPermission"]["action"]
         except (KeyError, TypeError): pass
+        try: self.organizerTransferCreatedTime = self.json["extensions"]["organizerTransferRequest"]["createdTime"]
+        except (KeyError, TypeError): pass
+        try: self.organizerTransferId = self.json["extensions"]["organizerTransferRequest"]["requestId"]
+        except (KeyError, TypeError): pass
 
         return self
 
@@ -2150,6 +2199,8 @@ class ThreadList:
         self.screeningRoomHostId = []
         self.screeningRoomPermission = []
         self.disabledTime = []
+        self.organizerTransferCreatedTime = []
+        self.organizerTransferId = []
 
     @property
     def ThreadList(self):
@@ -2168,6 +2219,8 @@ class ThreadList:
             except (KeyError, TypeError): self.isPinned.append(None)
             try: self.title.append(chat["title"])
             except (KeyError, TypeError): self.title.append(None)
+            try: self.membershipStatus.append(chat["membershipStatus"])
+            except (KeyError, TypeError): self.membershipStatus.append(None)
             try: self.content.append(chat["content"])
             except (KeyError, TypeError): self.content.append(None)
             try: self.needHidden.append(chat["needHidden"])
@@ -2232,6 +2285,10 @@ class ThreadList:
             except (KeyError, TypeError): self.disabledTime.append(None)
             try:  self.screeningRoomPermission.append(chat["extensions"]["screeningRoomPermission"]["action"])
             except (KeyError, TypeError): self.screeningRoomPermission.append(None)
+            try:  self.organizerTransferCreatedTime.append(chat["extensions"]["organizerTransferRequest"]["createdTime"])
+            except (KeyError, TypeError): self.organizerTransferCreatedTime.append(None)
+            try:  self.organizerTransferId.append(chat["extensions"]["organizerTransferRequest"]["requestId"])
+            except (KeyError, TypeError): self.organizerTransferId.append(None)
 
         return self
 
@@ -2610,7 +2667,8 @@ class Message:
         except (KeyError, TypeError): pass
         try: self.originalStickerId = self.json["extensions"]["originalStickerId"]
         except (KeyError, TypeError): pass
-        try: self.mentionUserIds = self.json["extensions"]["mentionUserIds"]
+        # mentions fixed by enchart
+        try: self.mentionUserIds = [m["uid"] for m in self.json["extensions"]["mentionedArray"]]
         except (KeyError, TypeError): pass
         try: self.tippingCoins = self.json["extensions"]["tippingCoins"]
         except (KeyError, TypeError): pass
@@ -2692,7 +2750,7 @@ class MessageList:
             except (KeyError, TypeError): self.duration.append(None)
             try: self.originalStickerId.append(x["extensions"]["originalStickerId"])
             except (KeyError, TypeError): self.originalStickerId.append(None)
-            try: self.mentionUserIds.append(x["extensions"]["mentionUserIds"])
+            try: self.mentionUserIds.append([m["uid"] for m in x["extensions"]["mentionedArray"]])
             except (KeyError, TypeError): self.mentionUserIds.append(None)
             try: self.videoExtensions.append(x["extensions"]["videoExtensions"])
             except (KeyError, TypeError): self.videoExtensions.append(None)
@@ -3345,5 +3403,420 @@ class Event:
         except (KeyError, TypeError): pass
         try: self.id = self.json["id"]
         except (KeyError, TypeError): pass
+
+        return self
+
+class JoinRequest:
+    def __init__(self, data):
+        _author = []
+
+        self.json = data
+
+        for y in data["communityMembershipRequestList"]:
+            try: _author.append(y)
+            except (KeyError, TypeError): _author.append(None)
+
+        self.author: UserProfileList = UserProfileList(_author).UserProfileList
+        self.communityMembershipRequestCount = None
+
+    @property
+    def JoinRequest(self):
+        try: self.communityMembershipRequestCount = self.json["communityMembershipRequestCount"]
+        except (KeyError, TypeError): pass
+
+        return self
+
+class CommunityStats:
+    def __init__(self, data):
+        self.json = data
+        self.dailyActiveMembers = None
+        self.monthlyActiveMembers = None
+        self.totalTimeSpent = None
+        self.totalPostsCreated = None
+        self.newMembersToday = None
+        self.totalMembers = None
+
+    @property
+    def CommunityStats(self):
+        try: self.dailyActiveMembers = self.json["dailyActiveMembers"]
+        except (KeyError, TypeError): pass
+        try: self.monthlyActiveMembers = self.json["monthlyActiveMembers"]
+        except (KeyError, TypeError): pass
+        try: self.totalTimeSpent = self.json["totalTimeSpent"]
+        except (KeyError, TypeError): pass
+        try: self.totalPostsCreated = self.json["totalPostsCreated"]
+        except (KeyError, TypeError): pass
+        try: self.newMembersToday = self.json["newMembersToday"]
+        except (KeyError, TypeError): pass
+        try: self.totalMembers = self.json["totalMembers"]
+        except (KeyError, TypeError): pass
+
+        return self
+
+
+class InviteCode:
+    def __init__(self, data):
+        self.json = data
+
+        try: self.author: UserProfile = UserProfile(data["author"]).UserProfile
+        except (KeyError, TypeError): self.author: UserProfile = UserProfile([])
+
+        self.status = None
+        self.duration = None
+        self.invitationId = None
+        self.link = None
+        self.modifiedTime = None
+        self.comId = None
+        self.createdTime = None
+        self.inviteCode = None
+
+    @property
+    def InviteCode(self):
+        try: self.status = self.json["status"]
+        except (KeyError, TypeError): pass
+        try: self.duration = self.json["duration"]
+        except (KeyError, TypeError): pass
+        try: self.invitationId = self.json["invitationId"]
+        except (KeyError, TypeError): pass
+        try: self.link = self.json["link"]
+        except (KeyError, TypeError): pass
+        try: self.modifiedTime = self.json["modifiedTime"]
+        except (KeyError, TypeError): pass
+        try: self.comId = self.json["ndcId"]
+        except (KeyError, TypeError): pass
+        try: self.createdTime = self.json["createdTime"]
+        except (KeyError, TypeError): pass
+        try: self.inviteCode = self.json["inviteCode"]
+        except (KeyError, TypeError): pass
+
+        return self
+
+
+class InviteCodeList:
+    def __init__(self, data):
+        _author = []
+
+        self.json = data
+
+        for y in data:
+            try: _author.append(y["author"])
+            except (KeyError, TypeError): _author.append(None)
+
+        self.author: UserProfileList = UserProfileList(_author).UserProfileList
+        self.status = []
+        self.duration = []
+        self.invitationId = []
+        self.link = []
+        self.modifiedTime = []
+        self.comId = []
+        self.createdTime = []
+        self.inviteCode = []
+
+    @property
+    def InviteCodeList(self):
+        for x in self.json:
+            try: self.status.append(x["status"])
+            except (KeyError, TypeError): self.status.append(None)
+            try: self.duration.append(x["duration"])
+            except (KeyError, TypeError): self.duration.append(None)
+            try: self.invitationId.append(x["invitationId"])
+            except (KeyError, TypeError): self.invitationId.append(None)
+            try: self.link.append(x["link"])
+            except (KeyError, TypeError): self.link.append(None)
+            try: self.modifiedTime.append(x["modifiedTime"])
+            except (KeyError, TypeError): self.modifiedTime.append(None)
+            try: self.comId.append(x["ndcId"])
+            except (KeyError, TypeError): self.comId.append(None)
+            try: self.createdTime.append(x["createdTime"])
+            except (KeyError, TypeError): self.createdTime.append(None)
+            try: self.inviteCode.append(x["inviteCode"])
+            except (KeyError, TypeError): self.inviteCode.append(None)
+
+        return self
+
+class WikiRequestList:
+    def __init__(self, data):
+        _author, _wiki, _originalWiki = [], [], []
+
+        self.json = data
+
+        for y in data:
+            try: _author.append(y["operator"])
+            except (KeyError, TypeError): _author.append(None)
+            try: _wiki.append(y["item"])
+            except (KeyError, TypeError): _wiki.append(None)
+            try: _originalWiki.append(y["originalItem"])
+            except (KeyError, TypeError): _originalWiki.append(None)
+
+        self.author: UserProfileList = UserProfileList(_author).UserProfileList
+        self.wiki: WikiList = WikiList(_wiki).WikiList
+        self.originalWiki: WikiList = WikiList(_originalWiki).WikiList
+
+        self.authorId = []
+        self.status = []
+        self.modifiedTime = []
+        self.message = []
+        self.wikiId = []
+        self.requestId = []
+        self.destinationItemId = []
+        self.createdTime = []
+        self.responseMessage = []
+
+    @property
+    def WikiRequestList(self):
+        for x in self.json:
+            try: self.authorId.append(x["uid"])
+            except (KeyError, TypeError): self.authorId.append(None)
+            try: self.status.append(x["status"])
+            except (KeyError, TypeError): self.status.append(None)
+            try: self.modifiedTime.append(x["modifiedTime"])
+            except (KeyError, TypeError): self.modifiedTime.append(None)
+            try: self.message.append(x["message"])
+            except (KeyError, TypeError): self.message.append(None)
+            try: self.wikiId.append(x["itemId"])
+            except (KeyError, TypeError): self.wikiId.append(None)
+            try: self.requestId.append(x["requestId"])
+            except (KeyError, TypeError): self.requestId.append(None)
+            try: self.destinationItemId.append(x["destinationItemId"])
+            except (KeyError, TypeError): self.destinationItemId.append(None)
+            try: self.createdTime.append(x["createdTime"])
+            except (KeyError, TypeError): self.createdTime.append(None)
+            try: self.responseMessage.append(x["responseMessage"])
+            except (KeyError, TypeError): self.responseMessage.append(None)
+
+        return self
+
+class NoticeList:
+    def __init__(self, data):
+        _author, _targetUser = [], []
+
+        self.json = data
+
+        for y in data:
+            try: _author.append(y["operator"])
+            except (KeyError, TypeError): _author.append(None)
+            try: _targetUser.append(y["targetUser"])
+            except (KeyError, TypeError): _targetUser.append(None)
+
+        self.author: UserProfileList = UserProfileList(_author).UserProfileList
+        self.targetUser: UserProfileList = UserProfileList(_targetUser).UserProfileList
+
+        self.title = []
+        self.icon = []
+        self.noticeId = []
+        self.status = []
+        self.comId = []
+        self.modifiedTime = []
+        self.createdTime = []
+        self.extensions = []
+        self.content = []
+        self.community = []
+        self.type = []
+        self.notificationId = []
+        self.authorId = []
+        self.style = []
+        self.backgroundColor = []
+        self.config = []
+        self.showCommunity = []
+        self.showAuthor = []
+        self.allowQuickOperation = []
+        self.operationList = []
+
+    @property
+    def NoticeList(self):
+        for x in self.json:
+            try: self.title.append(x["title"])
+            except (KeyError, TypeError): self.title.append(None)
+            try: self.icon.append(x["icon"])
+            except (KeyError, TypeError): self.icon.append(None)
+            try: self.noticeId.append(x["noticeId"])
+            except (KeyError, TypeError): self.noticeId.append(None)
+            try: self.status.append(x["status"])
+            except (KeyError, TypeError): self.status.append(None)
+            try: self.comId.append(x["ndcId"])
+            except (KeyError, TypeError): self.comId.append(None)
+            try: self.modifiedTime.append(x["modifiedTime"])
+            except (KeyError, TypeError): self.modifiedTime.append(None)
+            try: self.createdTime.append(x["createdTime"])
+            except (KeyError, TypeError): self.createdTime.append(None)
+            try: self.extensions.append(x["extensions"])
+            except (KeyError, TypeError): self.extensions.append(None)
+            try: self.authorId.append(x["extensions"]["operatorUid"])
+            except (KeyError, TypeError): self.authorId.append(None)
+            try: self.config.append(x["extensions"]["config"])
+            except (KeyError, TypeError): self.config.append(None)
+            try: self.showCommunity.append(x["extensions"]["config"]["showCommunity"])
+            except (KeyError, TypeError): self.showCommunity.append(None)
+            try: self.showAuthor.append(x["extensions"]["config"]["showOperator"])
+            except (KeyError, TypeError): self.showAuthor.append(None)
+            try: self.allowQuickOperation.append(x["extensions"]["config"]["allowQuickOperation"])
+            except (KeyError, TypeError): self.allowQuickOperation.append(None)
+            try: self.operationList.append(x["extensions"]["config"]["operationList"])
+            except (KeyError, TypeError): self.operationList.append(None)
+            try: self.style.append(x["extensions"]["style"])
+            except (KeyError, TypeError): self.style.append(None)
+            try: self.backgroundColor.append(x["extensions"]["style"]["backgroundColor"])
+            except (KeyError, TypeError): self.backgroundColor.append(None)
+            try: self.content.append(x["content"])
+            except (KeyError, TypeError): self.content.append(None)
+            try: self.community.append(x["community"])
+            except (KeyError, TypeError): self.community.append(None)
+            try: self.type.append(x["type"])
+            except (KeyError, TypeError): self.type.append(None)
+            try: self.notificationId.append(x["notificationId"])
+            except (KeyError, TypeError): self.notificationId.append(None)
+
+        return self
+
+
+class LiveLayer:
+    def __init__(self, data):
+        self.json = data
+
+        self.userProfileCount = []
+        self.topic = []
+        self.userProfileList = []
+        self.mediaList = []
+
+
+    @property
+    def LiveLayer(self):
+        for x in self.json:
+            try: self.userProfileCount.append(x["userProfileCount"])
+            except (KeyError, TypeError): self.userProfileCount.append(None)
+            try: self.topic.append(x["topic"])
+            except (KeyError, TypeError): self.topic.append(None)
+            try: self.userProfileList.append(UserProfileList(x["userProfileList"]).UserProfileList)
+            except (KeyError, TypeError): self.userProfileList.append(None)
+            try: self.mediaList.append(x["mediaList"])
+            except (KeyError, TypeError): self.mediaList.append(None)
+
+        return self
+
+
+class AvatarFrameList:
+    def __init__(self, data):
+        _author, _targetUser = [], []
+
+        self.json = data
+
+        for y in data:
+            try: _author.append(y["operator"])
+            except (KeyError, TypeError): _author.append(None)
+            try: _targetUser.append(y["targetUser"])
+            except (KeyError, TypeError): _targetUser.append(None)
+
+        self.author: UserProfileList = UserProfileList(_author).UserProfileList
+        self.targetUser: UserProfileList = UserProfileList(_targetUser).UserProfileList
+
+        self.isGloballyAvailable = []
+        self.extensions = []
+        self.frameType = []
+        self.resourceUrl = []
+        self.md5 = []
+        self.icon = []
+        self.createdTime = []
+        self.config = []
+        self.moodColor = []
+        self.configName = []
+        self.configVersion = []
+        self.userIconBorderColor = []
+        self.avatarFramePath = []
+        self.avatarId = []
+        self.ownershipStatus = []
+        self.frameUrl = []
+        self.additionalBenefits = []
+        self.firstMonthFreeAminoPlusMembership = []
+        self.restrictionInfo = []
+        self.ownerType = []
+        self.restrictType = []
+        self.restrictValue = []
+        self.availableDuration = []
+        self.discountValue = []
+        self.discountStatus = []
+        self.ownerId = []
+        self.ownershipInfo = []
+        self.isAutoRenew = []
+        self.modifiedTime = []
+        self.name = []
+        self.frameId = []
+        self.version = []
+        self.isNew = []
+        self.availableComIds = []
+        self.status = []
+
+    @property
+    def AvatarFrameList(self):
+        for x in self.json:
+            try: self.isGloballyAvailable.append(x["isGloballyAvailable"])
+            except (KeyError, TypeError): self.isGloballyAvailable.append(None)
+            try: self.extensions.append(x["extensions"])
+            except (KeyError, TypeError): self.extensions.append(None)
+            try: self.frameType.append(x["frameType"])
+            except (KeyError, TypeError): self.frameType.append(None)
+            try: self.resourceUrl.append(x["resourceUrl"])
+            except (KeyError, TypeError): self.resourceUrl.append(None)
+            try: self.md5.append(x["md5"])
+            except (KeyError, TypeError): self.md5.append(None)
+            try: self.icon.append(x["icon"])
+            except (KeyError, TypeError): self.icon.append(None)
+            try: self.createdTime.append(x["createdTime"])
+            except (KeyError, TypeError): self.createdTime.append(None)
+            try: self.config.append(x["config"])
+            except (KeyError, TypeError): self.config.append(None)
+            try: self.moodColor.append(x["config"]["moodColor"])
+            except (KeyError, TypeError): self.moodColor.append(None)
+            try: self.configName.append(x["config"]["name"])
+            except (KeyError, TypeError): self.configName.append(None)
+            try: self.configVersion.append(x["config"]["version"])
+            except (KeyError, TypeError): self.configVersion.append(None)
+            try: self.userIconBorderColor.append(x["config"]["userIconBorderColor"])
+            except (KeyError, TypeError): self.userIconBorderColor.append(None)
+            try: self.avatarFramePath.append(x["config"]["avatarFramePath"])
+            except (KeyError, TypeError): self.avatarFramePath.append(None)
+            try: self.avatarId.append(x["config"]["id"])
+            except (KeyError, TypeError): self.avatarId.append(None)
+            try: self.ownershipStatus.append(x["ownershipStatus"])
+            except (KeyError, TypeError): self.ownershipStatus.append(None)
+            try: self.frameUrl.append(x["frameUrl"])
+            except (KeyError, TypeError): self.frameUrl.append(None)
+            try: self.additionalBenefits.append(x["additionalBenefits"])
+            except (KeyError, TypeError): self.additionalBenefits.append(None)
+            try: self.firstMonthFreeAminoPlusMembership.append(x["additionalBenefits"]["firstMonthFreeAminoPlusMembership"])
+            except (KeyError, TypeError): self.firstMonthFreeAminoPlusMembership.append(None)
+            try: self.restrictionInfo.append(x["restrictionInfo"])
+            except (KeyError, TypeError): self.restrictionInfo.append(None)
+            try: self.ownerType.append(x["restrictionInfo"]["ownerType"])
+            except (KeyError, TypeError): self.ownerType.append(None)
+            try: self.restrictType.append(x["restrictionInfo"]["restrictType"])
+            except (KeyError, TypeError): self.restrictType.append(None)
+            try: self.restrictValue.append(x["restrictionInfo"]["restrictValue"])
+            except (KeyError, TypeError): self.restrictValue.append(None)
+            try: self.availableDuration.append(x["restrictionInfo"]["availableDuration"])
+            except (KeyError, TypeError): self.availableDuration.append(None)
+            try: self.discountValue.append(x["restrictionInfo"]["discountValue"])
+            except (KeyError, TypeError): self.discountValue.append(None)
+            try: self.discountStatus.append(x["restrictionInfo"]["discountStatus"])
+            except (KeyError, TypeError): self.discountStatus.append(None)
+            try: self.ownerId.append(x["restrictionInfo"]["ownerUid"])
+            except (KeyError, TypeError): self.ownerId.append(None)
+            try: self.ownershipInfo.append(x["ownershipInfo"])
+            except (KeyError, TypeError): self.ownershipInfo.append(None)
+            try: self.isAutoRenew.append(x["ownershipInfo"]["isAutoRenew"])
+            except (KeyError, TypeError): self.isAutoRenew.append(None)
+            try: self.name.append(x["name"])
+            except (KeyError, TypeError): self.name.append(None)
+            try: self.modifiedTime.append(x["modifiedTime"])
+            except (KeyError, TypeError): self.modifiedTime.append(None)
+            try: self.frameId.append(x["frameId"])
+            except (KeyError, TypeError): self.frameId.append(None)
+            try: self.version.append(x["version"])
+            except (KeyError, TypeError): self.version.append(None)
+            try: self.isNew.append(x["isNew"])
+            except (KeyError, TypeError): self.isNew.append(None)
+            try: self.status.append(x["status"])
+            except (KeyError, TypeError): self.status.append(None)
+            try: self.availableComIds.append(x["availableNdcIds"])
+            except (KeyError, TypeError): self.availableComIds.append(None)
 
         return self

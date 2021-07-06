@@ -8,9 +8,10 @@ from sys import _getframe as getframe
 
 from .lib.util import objects
 
+
 class SocketHandler:
     def __init__(self, client, socket_trace = False, debug = False):
-        # websocket.enableTrace(True)
+        if socket_trace: websocket.enableTrace(True)
         self.socket_url = "wss://ws1.narvii.com"
         self.client = client
         self.debug = debug
@@ -23,10 +24,8 @@ class SocketHandler:
         self.socketDelay = 0
         self.socket_trace = socket_trace
         self.socketDelayFetch = 120  # Reconnects every 120 seconds.
-        #threading.Thread(target=self.reconnect_handler).start()
-        #websocket.enableTrace(socket_trace)
 
-    def run(self):
+    def run_socket(self):
         threading.Thread(target=self.reconnect_handler).start()
         websocket.enableTrace(self.socket_trace)
 
@@ -34,6 +33,7 @@ class SocketHandler:
         # Made by enchart#3410 thx
         # Fixed by The_Phoenix#3967
         # Fixed by enchart again lmao
+        # Fixed by Phoenix one more time lol
         while True:
             if self.debug:
                 print(f"[socket][reconnect_handler] socketDelay : {self.socketDelay}")
@@ -51,7 +51,6 @@ class SocketHandler:
             if not self.reconnect:
                 if self.debug:
                     print(f"[socket][reconnect_handler] reconnect is False, breaking")
-
                 break
 
             time.sleep(5)
@@ -59,8 +58,6 @@ class SocketHandler:
     def on_open(self):
         if self.debug:
             print("[socket][on_open] Socket Opened")
-
-        pass
 
     def on_close(self):
         if self.debug:
@@ -71,8 +68,6 @@ class SocketHandler:
         if self.reconnect:
             if self.debug:
                 print("[socket][on_close] reconnect is True, Opening Socket")
-
-            self.start()
 
     def on_ping(self, data):
         if self.debug:
@@ -148,6 +143,8 @@ class Callbacks:
             "1:0": self.on_strike_message,
             "2:110": self.on_voice_message,
             "3:113": self.on_sticker_message,
+            "50:0": self.TYPE_USER_SHARE_EXURL,
+            "51:0": self.TYPE_USER_SHARE_USER,
             "52:0": self.on_voice_chat_not_answered,
             "53:0": self.on_voice_chat_not_cancelled,
             "54:0": self.on_voice_chat_not_declined,
@@ -237,6 +234,8 @@ class Callbacks:
     def on_strike_message(self, data): self.call(getframe(0).f_code.co_name, objects.Event(data["o"]).Event)
     def on_voice_message(self, data): self.call(getframe(0).f_code.co_name, objects.Event(data["o"]).Event)
     def on_sticker_message(self, data): self.call(getframe(0).f_code.co_name, objects.Event(data["o"]).Event)
+    def TYPE_USER_SHARE_EXURL(self, data): self.call(getframe(0).f_code.co_name, objects.Event(data["o"]).Event)
+    def TYPE_USER_SHARE_USER(self, data): self.call(getframe(0).f_code.co_name, objects.Event(data["o"]).Event)
     def on_voice_chat_not_answered(self, data): self.call(getframe(0).f_code.co_name, objects.Event(data["o"]).Event)
     def on_voice_chat_not_cancelled(self, data): self.call(getframe(0).f_code.co_name, objects.Event(data["o"]).Event)
     def on_voice_chat_not_declined(self, data): self.call(getframe(0).f_code.co_name, objects.Event(data["o"]).Event)

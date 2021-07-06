@@ -61,6 +61,15 @@ class ActionNotAllowed(Exception):
     def __init__(*args, **kwargs):
         Exception.__init__(*args, **kwargs)
 
+class ServiceUnderMaintenance(Exception):
+    """
+    - **API Code** : 111
+    - **API Message** : Sorry, this service is under maintenance. Please check back later.
+    - **API String** : ``Unknown String``
+    """
+    def __init__(*args, **kwargs):
+        Exception.__init__(*args, **kwargs)
+
 class MessageNeeded(Exception):
     """
     - **API Code** : 113
@@ -192,6 +201,15 @@ class UserNotMemberOfCommunity(Exception):
     - **API Code** : 230
     - **API Message** : You have to join this Community first.
     - **API String** : API_ERR_USER_NOT_IN_COMMUNITY
+    """
+    def __init__(*args, **kwargs):
+        Exception.__init__(*args, **kwargs)
+
+class RequestRejected(Exception):
+    """
+    - **API Code** : 235
+    - **API Message** : Request rejected. You have been temporarily muted (read only mode) because you have received a strike. To learn more, please check the Help Center.
+    - **API String** : ``Unknown String``
     """
     def __init__(*args, **kwargs):
         Exception.__init__(*args, **kwargs)
@@ -394,6 +412,15 @@ class CommunityCreateLimitReached(Exception):
     def __init__(*args, **kwargs):
         Exception.__init__(*args, **kwargs)
 
+class CommunityDisabled(Exception):
+    """
+    - **API Code** : 814
+    - **API Message** : This Community is disabled.
+    - **API String** : ``Unknown String``
+    """
+    def __init__(*args, **kwargs):
+        Exception.__init__(*args, **kwargs)
+
 class CommunityDeleted(Exception):
     """
     - **API Code** : 833
@@ -403,10 +430,47 @@ class CommunityDeleted(Exception):
     def __init__(*args, **kwargs):
         Exception.__init__(*args, **kwargs)
 
+class DuplicatePollOption(Exception):
+    """
+    - **API Code** : 1501
+    - **API Message** : Sorry, you have duplicate poll options.
+    - **API String** : ``Unknown String``
+    """
+    def __init__(*args, **kwargs):
+        Exception.__init__(*args, **kwargs)
+
+class ReachedMaxPollOptions(Exception):
+    """
+    - **API Code** : 1507
+    - **API Message** : Sorry, you can only join or add up to 5 of your items per poll.
+    - **API String** : ``Unknown String``
+    """
+    def __init__(*args, **kwargs):
+        Exception.__init__(*args, **kwargs)
+
+class TooManyChats(Exception):
+    """
+    - **API Code** : 1602
+    - **API Message** : Sorry, you can only have up to 1000 chat sessions.
+    - **API String** : ``Unknown String``
+    """
+
+    def __init__(*args, **kwargs):
+        Exception.__init__(*args, **kwargs)
+
 class ChatFull(Exception):
     """
     - **API Code** : 1605
     - **API Message** : ``Unknown Message``
+    - **API String** : ``Unknown String``
+    """
+    def __init__(*args, **kwargs):
+        Exception.__init__(*args, **kwargs)
+
+class TooManyInviteUsers(Exception):
+    """
+    - **API Code** : 1606
+    - **API Message** : Sorry, you can only invite up to 999 people.
     - **API String** : ``Unknown String``
     """
     def __init__(*args, **kwargs):
@@ -470,6 +534,24 @@ class ChatViewOnly(Exception):
     """
     - **API Code** : 1663
     - **API Message** : ``Unknown Message``
+    - **API String** : ``Unknown String``
+    """
+    def __init__(*args, **kwargs):
+        Exception.__init__(*args, **kwargs)
+
+class ChatMessageTooBig(Exception):
+    """
+    - **API Code** : 1664
+    - **API Message** : ``Unknown Message``
+    - **API String** : API_ERR_CHAT_MESSAGE_CONTENT_TOO_LONG
+    """
+    def __init__(*args, **kwargs):
+        Exception.__init__(*args, **kwargs)
+
+class InviteCodeNotFound(Exception):
+    """
+    - **API Code** : 1900
+    - **API Message** : Sorry, the requested data no longer exists. Try refreshing the view.
     - **API String** : ``Unknown String``
     """
     def __init__(*args, **kwargs):
@@ -732,6 +814,13 @@ class ReasonNeeded(Exception):
         Exception.__init__(*args, **kwargs)
 
 
+class TransferRequestNeeded(Exception):
+    """
+    Raised when you need to transfer host to complete the action.
+    """
+    def __init__(*args, **kwargs):
+        Exception.__init__(*args, **kwargs)
+
 class LibraryUpdateAvailable(Exception):
     """
     Raised when a new library update is available.
@@ -750,8 +839,10 @@ def CheckException(data):
     elif api_code == 106: raise AccessDenied(data)
     elif api_code == 107: raise UnexistentData(data)
     elif api_code == 110: raise ActionNotAllowed(data)
+    elif api_code == 111: raise ServiceUnderMaintenance(data)
     elif api_code == 113: raise MessageNeeded(data)
     elif api_code == 200: raise InvalidAccountOrPassword(data)
+    elif api_code == 201: raise AccountDisabled(data)
     elif api_code == 213: raise InvalidEmail(data)
     elif api_code == 214: raise InvalidPassword(data)
     elif api_code == 215: raise EmailAlreadyTaken(data) and UnsupportedEmail(data)
@@ -762,6 +853,7 @@ def CheckException(data):
     elif api_code == 225: raise UserUnavailable(data)
     elif api_code == 229: raise YouAreBanned(data)
     elif api_code == 230: raise UserNotMemberOfCommunity(data)
+    elif api_code == 235: raise RequestRejected(data)
     elif api_code == 238: raise ActivateAccount(data)
     elif api_code == 239: raise CantLeaveCommunity(data)
     elif api_code == 240: raise ReachedTitleLength(data)
@@ -784,8 +876,13 @@ def CheckException(data):
     elif api_code == 802: raise InvalidCodeOrLink(data)
     elif api_code == 805: raise CommunityNameAlreadyTaken(data)
     elif api_code == 806: raise CommunityCreateLimitReached(data)
+    elif api_code == 814: raise CommunityDisabled(data)
     elif api_code == 833: raise CommunityDeleted(data)
+    elif api_code == 1501: raise DuplicatePollOption(data)
+    elif api_code == 1507: raise ReachedMaxPollOptions(data)
+    elif api_code == 1602: raise TooManyChats(data)
     elif api_code == 1605: raise ChatFull(data)
+    elif api_code == 1606: raise TooManyInviteUsers(data)
     elif api_code == 1611: raise ChatInvitesDisabled(data)
     elif api_code == 1612: raise RemovedFromChat(data)
     elif api_code == 1613: raise UserNotJoined(data)
@@ -793,6 +890,8 @@ def CheckException(data):
     elif api_code == 1637: raise MemberKickedByOrganizer(data)
     elif api_code == 1661: raise LevelFiveRequiredToEnableProps(data)
     elif api_code == 1663: raise ChatViewOnly(data)
+    elif api_code == 1664: raise ChatMessageTooBig(data)
+    elif api_code == 1900: raise InviteCodeNotFound(data)
     elif api_code == 2001: raise AlreadyRequestedJoinCommunity(data)
     elif api_code == 2501: raise API_ERR_PUSH_SERVER_LIMITATION_APART(data)
     elif api_code == 2502: raise API_ERR_PUSH_SERVER_LIMITATION_COUNT(data)

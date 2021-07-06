@@ -10,8 +10,10 @@ from random import choice
 from datetime import datetime
 from amino import Client, SubClient, ACM
 from uuid import uuid4
+from inspect import getfullargspec
 from os import system
-# this is the Slimakoi's API with some of my patches
+
+# this is Slimakoi's API with some of my patches
 
 # API made by ThePhoenix78
 # Big optimisation thanks to SempreLEGIT#1378 ♥
@@ -38,12 +40,19 @@ class Command:
         self.conditions = {}
 
     def execute(self, commande, data, type: str = "command"):
-        if commande in self.conditions[type].keys():
+        com = self.commands[type][commande]
+        arg = getfullargspec(com).args
+        arg.pop(0)
+        s = len(arg)
+        dico = {}
+        if s:
+            dico = {key: value for key, value in zip(arg, data.message.split()[0:s])}
+
+        if self.conditions[type].get(commande, None):
             if self.conditions[type][commande](data):
-                return self.commands[type][commande](data)
-            else:
-                return
-        return self.commands[type][commande](data)
+                return self.commands[type][commande](data, **dico)
+            return
+        return self.commands[type][commande](data, **dico)
 
     def categorie_exist(self, type: str):
         return type in self.commands.keys()
@@ -76,7 +85,6 @@ class Command:
             if callable(condition):
                 for command in name:
                     self.conditions[type][command] = condition
-
             for command in name:
                 self.commands[type][command.lower()] = command_funct
             return command_funct
@@ -226,7 +234,10 @@ class BannedWords:
 
 
 class Parameters:
-    __slots__ = ("subClient", "chatId", "authorId", "author", "message", "messageId", "authorIcon", "comId", "info")
+    __slots__ = (
+                    "subClient", "chatId", "authorId", "author", "message", "messageId",
+                    "authorIcon", "comId", "replySrc", "replyMsg", "replyId", "info"
+                 )
 
     def __init__(self, data, subClient):
         self.subClient = subClient
@@ -237,13 +248,25 @@ class Parameters:
         self.messageId = data.message.messageId
         self.authorIcon = data.message.author.icon
         self.comId = data.comId
+
+        self.replySrc = None
+        self.replyId = None
+        if data.message.extensions and data.message.extensions.get('replyMessage', None) and data.message.extensions['replyMessage'].get('mediaValue', None):
+            self.replySrc = data.message.extensions['replyMessage']['mediaValue'].replace('_00.', '_hq.')
+            self.replyId = data.message.extensions['replyMessage']['messageId']
+
+        self.replyMsg = None
+        if data.message.extensions and data.message.extensions.get('replyMessage', None) and data.message.extensions['replyMessage'].get('content', None):
+            self.replyMsg = data.message.extensions['replyMessage']['content']
+            self.replyId = data.message.extensions['replyMessage']['messageId']
+
         self.info = data
 
 
 class BotAmino(Command, Client, TimeOut, BannedWords):
-    def __init__(self, email: str = None, password: str = None, sid: str = None,  proxies: dict = None):
+    def __init__(self, email: str = None, password: str = None, sid: str = None,  proxies: dict = None, deviceId: str = None, certificatePath: str = None):
         Command.__init__(self)
-        Client.__init__(self, proxies=proxies)
+        Client.__init__(self, proxies=proxies, deviceId=deviceId, certificatePath=certificatePath)
 
         if email and password:
             self.login(email=email, password=password)
@@ -273,6 +296,7 @@ class BotAmino(Command, Client, TimeOut, BannedWords):
         self.no_command_message = ""
         self.spam_message = "You are spamming, be careful"
         self.lock_message = "Command locked sorry"
+        self.launched = False
 
     def tradlist(self, sub):
         sublist = []
@@ -283,6 +307,12 @@ class BotAmino(Command, Client, TimeOut, BannedWords):
                 continue
             sublist.append(elem)
         return sublist
+
+    def send_data(self, data):
+        self.send(data)
+
+    def add_community(self, comId):
+        self.communaute[comId] = Bot(self, comId, self.prefix, self.bio, self.activity)
 
     def get_community(self, comId):
         return self.communaute[comId]
@@ -376,6 +406,19 @@ class BotAmino(Command, Client, TimeOut, BannedWords):
         data = dumps(data)
         self.send(data)
 
+    def show_online(self, comId):
+        data = {
+            "o": {
+                "actions": ["Browsing"],
+                "target": f"ndc://x{comId}/",
+                "ndcId": int(comId),
+                "id": "82333"
+            },
+            "t":304}
+        data = dumps(data)
+        slp(1)
+        self.send(data)
+
     def check(self, args, *can, id_=None):
         id_ = id_ if id_ else args.authorId
         foo = {'staff': args.subClient.is_in_staff,
@@ -385,8 +428,16 @@ class BotAmino(Command, Client, TimeOut, BannedWords):
             if foo[i](id_):
                 return True
 
-    def threadLaunch(self, commu, passive):
-        self.communaute[commu] = Bot(self, commu, self.prefix, self.bio, self.activity)
+    def check_all(self):
+        amino_list = self.sub_clients()
+        for com in amino_list.comId:
+            try:
+                self.communaute[com].check_in()
+            except Exception:
+                pass
+
+    def threadLaunch(self, commu, passive: bool=False):
+        self.communaute[commu] = Bot(self, commu, self.prefix, self.bio, passive)
         slp(30)
         if passive:
             self.communaute[commu].passive()
@@ -395,6 +446,9 @@ class BotAmino(Command, Client, TimeOut, BannedWords):
         amino_list = self.sub_clients()
         self.len_community = len(amino_list.comId)
         [Thread(target=self.threadLaunch, args=[commu, passive]).start() for commu in amino_list.comId]
+
+        if self.launched:
+            return
 
         if self.categorie_exist("command") or self.categorie_exist("answer"):
             self.launch_text_message()
@@ -416,6 +470,39 @@ class BotAmino(Command, Client, TimeOut, BannedWords):
 
         if self.categorie_exist("on_all"):
             self.launch_all_message()
+
+        self.launched = True
+
+    def single_launch(self, commu, passive: bool = False):
+        amino_list = self.sub_clients()
+        self.len_community = len(amino_list.comId)
+        Thread(target=self.threadLaunch, args=[commu, passive]).start()
+
+        if self.launched:
+            return
+
+        if self.categorie_exist("command") or self.categorie_exist("answer"):
+            self.launch_text_message()
+
+        if self.categorie_exist("on_member_join_chat"):
+            self.launch_on_member_join_chat()
+
+        if self.categorie_exist("on_member_leave_chat"):
+            self.launch_on_member_leave_chat()
+
+        if self.categorie_exist("on_other"):
+            self.launch_other_message()
+
+        if self.categorie_exist("on_remove"):
+            self.launch_removed_message()
+
+        if self.categorie_exist("on_delete"):
+            self.launch_delete_message()
+
+        if self.categorie_exist("on_all"):
+            self.launch_all_message()
+
+        self.launched = True
 
     def message_analyse(self, data, type):
         try:
@@ -471,13 +558,9 @@ class BotAmino(Command, Client, TimeOut, BannedWords):
                 self.time_user(args.authorId, self.wait)
                 if command.lower() in self.commands["command"].keys():
                     
-                    # Essa parte do código foi escrita por Jake
-                    # Ela cuida da parte da pontuação
                     system(f"python3 scripts/ranking.py {args.authorId}")
-                    
-                    # Isso aqui foi o phoenix
                     Thread(target=self.execute, args=[command, args]).start()
-                    
+
                 elif self.no_command_message:
                     subClient.send_message(args.chatId, self.no_command_message)
                 return
@@ -617,7 +700,7 @@ class Bot(SubClient, ACM):
 
         self.update_file(old_dict)
 
-        self.subclient = SubClient(comId=self.community_id, profile=client.profile)
+        # self.subclient = SubClient(comId=self.community_id, profile=client.profile)
 
         self.banned_words = self.get_file_info("banned_words")
         self.locked_command = self.get_file_info("locked_command")
@@ -632,16 +715,13 @@ class Bot(SubClient, ACM):
 
         self.new_users = [elem["uid"] for elem in new_users.json["userProfileList"]]
 
-        if self.welcome_chat or self.message_bvn:
-            Thread(target=self.check_new_member).start()
-
     def create_community_file(self):
         with open(f'{path_amino}/{self.community_amino_id}.json', 'w', encoding='utf8') as file:
             dict = self.create_dict()
             file.write(dumps(dict, sort_keys=False, indent=4))
 
     def create_dict(self):
-        return {"welcome": "", "prefix": self.prefix, "welcome_chat": "","locked_command": [], "favorite_users": [], "favorite_chats": [], "banned_words": []}
+        return {"welcome": "", "prefix": self.prefix, "welcome_chat": "", "locked_command": [], "favorite_users": [], "favorite_chats": [], "banned_words": []}
 
     def get_dict(self):
         return {"welcome": self.message_bvn, "prefix": self.prefix, "welcome_chat": self.welcome_chat, "locked_command": self.locked_command,
@@ -824,12 +904,12 @@ class Bot(SubClient, ACM):
         self.marche = True
         Thread(target=self.passive).start()
 
-    def leave_community(self):
-        self.client.leave_community(comId=self.community_id)
+    def leave_amino(self):
         self.marche = False
         for elem in self.get_public_chat_threads().chatId:
             with suppress(Exception):
                 self.leave_chat(elem)
+        self.client.leave_community(comId=self.community_id)
 
     def check_new_member(self):
         if not (self.message_bvn or self.welcome_chat):
@@ -1036,8 +1116,9 @@ class Bot(SubClient, ACM):
                 feature_users()
                 k = 0
 
-            slp(30)
             if self.activity:
                 upt_activity()
+
+            slp(30)
             j += 1
             k += 1
