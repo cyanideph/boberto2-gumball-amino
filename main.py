@@ -94,6 +94,7 @@ def ajuda(data):
 [c] !pontos - Vê a quantidade de pontos
 [c] !conquistas - Vê suas conquistas
 [c] !vote [criar, votar, ver] - Cria, vota ou vê uma enquete. !help vote para mais
+[c] !claim [ver, claim] - Ver - Vê quantas acs você pode retirar, claim - retira suas acs (apartir de 10 acs)
         """, "Página 2"))
     elif data.message == "sorteios":
         data.subClient.send_message(data.chatId, esteticabase("help", """
