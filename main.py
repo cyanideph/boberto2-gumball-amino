@@ -91,6 +91,9 @@ def ajuda(data):
         data.subClient.send_message(data.chatId, esteticabase("help", """
 [c] !8ball [Pergunta] - Responde sua pergunta com sim ou não
 [c] !compatibilidade [pessoa] - Checa sua compatibilidade
+[c] !pontos - Vê a quantidade de pontos
+[c] !conquistas - Vê suas conquistas
+[c] !vote [criar, votar, ver] - Cria, vota ou vê uma enquete. !help vote para mais
         """, "Página 2"))
     elif data.message == "sorteios":
         data.subClient.send_message(data.chatId, esteticabase("help", """
@@ -98,6 +101,16 @@ def ajuda(data):
 [c]     n - Sorteia um número. Argumentos: Numéro inicial, número final
 [c]     p - Sorteia nomes. Argumentos: nomes (não possui limites)
         """, "Sorteios"))
+    elif data.message == "vote":
+        data.subClient.send_message(data.chatId, esteticabase("help", """
+[c] Modos:
+[c]    criar - cria uma enquete
+[c]       Argumentos: !vote criar; opção 1; opção 2; etc...
+[c]     votar - vota numa enquete
+[c]         Argumentos: !vote votar; id; opção
+[c]     ver - vê os resultados da enquete
+[c]         Argumentos !vote ver; id
+        """, "Vote"))
     else:
         data.subClient.send_message(data.chatId, "Digite o número da página. (Total de páginas: 2)")
 
@@ -340,7 +353,7 @@ def wiki(data):
         return False
     wpr = (wp.content).split("\n")
     
-    # Manda a primeira linha btw
+    # Manda o primeiro paragrafo
     data.subClient.send_message(data.chatId, esteticabase(wp.title, f"""[c]{wpr[0]}
 
 [c]Mais informação em: {wp.url}""", f"Sumário de {wp.title}"))
@@ -432,6 +445,58 @@ def conquistas(data):
     f"""
 [c]
 [c]{conqsform}""", f"Conquistas de {data.author}"))
+
+
+# !vote
+@client.command("vote")
+def votar(data):
+    args = (data.message).split(";")
+    # Cria uma eqnuete com pollid
+    if args[0] == "criar":
+        pollid = randint(0, 9999)
+        # Arquivos JSON não suportam espaços
+        for l in range(0, len(args[1:])):
+            args[l+1] = (args[l+1].strip(" ")).replace(" ", "_")
+
+        system(f"python3 scripts/polls.py criar {pollid} {' '.join(args[1:])}")
+        data.subClient.send_message(data.chatId, f"Criada uma enquete com o ID '{pollid}'")
+    elif args[0] == "votar":
+        args[2] = (args[2].strip(" ")).replace(" ", "_")
+        system(f"python3 scripts/polls.py votar {args[1]} {args[2]}")
+        data.subClient.send_message(data.chatId, "Votado!")
+    elif args[0] == "ver":
+        polljson = load(open(f"enquetes/{args[1].strip(' ')}.json", "r"))
+        # Salva os valores em uma lista
+        jvalues = []
+        for k, v in polljson.items():
+            jvalues.append(f"\n[c]{k}: {v}")
+        
+        # Mostra os resultados
+        data.subClient.send_message(data.chatId, esteticabase("Enquete", f"{''.join(jvalues)}", "Resultados"))
+
+
+# !claim (comando pegado e adaptado o servidor do discord do Phoenix)
+@client.command("claim")
+def claim(args):
+    jclaims = load(open(f"info/{args.authorId}.json", "r"))
+    
+    coins = args.subClient.get_wallet_amount()
+    if coins >= 1 and jclaims["claims"] >= 1 and args.message == "claim":
+        args.subClient.pay(int(jclaims["claims"])*10, chatId=args.chatId)
+        args.subClient.send_message(args.chatId, "Enviado!")
+        if conquista(args.authorId, "o_capitalista", 1000):
+            args.subClient.send_message(args.chatId, conquistado("O capitalista", 1000, "Dê !claim e ganhe acs pela primeira vez."))
+        system(f"python3 scripts/ranking.py {args.authorId} ! {jclaims['claims']*1000}")
+    elif args.message == "ver":
+        args.subClient.send_message(args.chatId, f"Você pode pegar {jclaims['claims']*10} acs.")
+    else:
+        args.subClient.send_message(args.chatId, "Erro!")
+
+
+# !musica
+@client.command("musica")
+def chamada(data):
+    client.play(data.chatId, data.comId, data.message)
 
 
 client.launch()

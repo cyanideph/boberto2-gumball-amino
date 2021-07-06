@@ -23,7 +23,18 @@ def mponto(pontos):
 # Adiciona os pontos de comando
 mponto(10)
 
-# Comandos de conquistas
+try:
+    if args[2] == "!":
+        userjson["claims"] = 0
+        userjson["points"] = userjson["points"] - int(float(args[3]))
+        open(f"info/{args[1]}.json", "w").write(dumps(userjson))
+        exit()
+except IndexError:
+    pass
+
+# Checa quantas acs o usuário pode pegar com base nos pontos
+userjson["claims"] = userjson["points"] / 1000
+open(f"info/{args[1]}.json", "w").write(dumps(userjson))
 
 # Aqui checa se o argumento para conquistas existe para prosseguir
 try:
