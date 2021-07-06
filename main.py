@@ -30,6 +30,30 @@ def esteticabase(titulo, conteudo, subtitulo=""):
         """
 
 
+# Sistema de conquistas (a parte do código principal)
+def conquista(id, conquista):
+
+    # Primeiro é rodado para se criar o arquivo JSON se não tiver um
+    system(f"python3 scripts/conquistas.py {id} ignore")
+
+    # É lodado o arquivo JSON para checar se a conquista já foi conquistada
+    userjson = load(open(f"conquistas/{id}.json", "r"))
+    
+    # É checado
+    try:
+        if userjson[conquista] != "1":
+            system(f"python3 scripts/conquistas.py {id} {conquista}")
+            # Se o usuário não possuir essa conquista é retornado True
+            return True
+        else:
+            # Se não, é retornado False
+            return False
+    except KeyError:
+        # Em caso de KeyError, é considerado a conquista como não conquistada
+        system(f"python3 scripts/conquistas.py {id} {conquista}")
+        return True
+
+
 # Comando simples que manda msg
 @client.command("hello")
 def ola(data):
@@ -39,6 +63,12 @@ def ola(data):
 # !help
 @client.command("help")
 def ajuda(data):
+    if conquista(data.authorId, "ajuda_caralho"):
+        data.subClient.send_message(data.chatId, f"""[c]Conquista
+[c]
+[bc]Ajuda caralho
+[ci]Digite !help pela primeira vez
+[cu]+100 pontos""")
     # Ele verifica a página pedida e então mostra os comandos
     if data.message == "1":
         data.subClient.send_message(data.chatId, esteticabase("help", """

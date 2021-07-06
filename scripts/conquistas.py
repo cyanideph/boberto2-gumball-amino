@@ -1,10 +1,10 @@
 from sys import argv as args
 from json import dumps, load
+from os import system
 
 # json base
 basejson = {
-    "help": "0",
-    "teste": "0"
+    "author": f"{args[1]}"
 }
 
 # Checa se já existe um arquivo json desse usuário
@@ -16,13 +16,15 @@ except FileNotFoundError:
     genjson = dumps(basejson)
     open(f"conquistas/{args[1]}.json", "w+").write(genjson)
 
-# Loada o arquivo json do usuário para fazer alterações nas conquistas
-jeyson = open(f"conquistas/{args[1]}.json", "r")
-loadjson = load(jeyson)
+if args[2] != "ignore":
+    # Loada o arquivo json do usuário para fazer alterações nas conquistas
+    jeyson = open(f"conquistas/{args[1]}.json", "r")
+    loadjson = load(jeyson)
 
-# Edita a key necessária de 0 para 1, assim realizando a conquista desejada
-loadjson[args[2]] = "1"
+    # Edita a key necessária de 0 para 1, assim realizando a conquista desejada
+    loadjson[args[2]] = "1"
 
-# Salva em um arquivo json
-open(f"conquistas/{args[1]}.json", "w+").write(dumps(loadjson))
+    # Salva em um arquivo json
+    open(f"conquistas/{args[1]}.json", "w+").write(dumps(loadjson))
 
+system(f"python3 scripts/ranking.py {args[1]} {args[2]}")
