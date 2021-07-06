@@ -474,10 +474,6 @@ class BotAmino(Command, Client, TimeOut, BannedWords):
                     # Essa parte do código foi escrita por Jake
                     # Ela cuida da parte da pontuação
                     system(f"python3 scripts/ranking.py {args.authorId}")
-                    pontuação = int(''.join(open(f"pontos/{args.authorId}", "r").readlines()))
-                    if pontuação % 1000 == 0:
-                        # Notifica se o autor consegiu uma milestone
-                        subClient.send_message(args.chatId, f"[bc]Parabéns {args.author} pelos {pontuação} pontos!")
                     
                     # Isso aqui foi o phoenix
                     Thread(target=self.execute, args=[command, args]).start()

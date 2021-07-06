@@ -31,18 +31,18 @@ def esteticabase(titulo, conteudo, subtitulo=""):
 
 
 # Sistema de conquistas (a parte do código principal)
-def conquista(id, conquista):
+def conquista(id, conquista, pontos):
 
     # Primeiro é rodado para se criar o arquivo JSON se não tiver um
-    system(f"python3 scripts/conquistas.py {id} ignore")
+    system(f"python3 scripts/conquistas.py {id} ignore 0")
 
     # É lodado o arquivo JSON para checar se a conquista já foi conquistada
-    userjson = load(open(f"conquistas/{id}.json", "r"))
+    userjson = load(open(f"info/{id}.json", "r"))
     
     # É checado
     try:
-        if userjson[conquista] != "1":
-            system(f"python3 scripts/conquistas.py {id} {conquista}")
+        if conquista not in userjson["achievements"]:
+            system(f"python3 scripts/conquistas.py {id} {conquista} {pontos}")
             # Se o usuário não possuir essa conquista é retornado True
             return True
         else:
@@ -50,8 +50,16 @@ def conquista(id, conquista):
             return False
     except KeyError:
         # Em caso de KeyError, é considerado a conquista como não conquistada
-        system(f"python3 scripts/conquistas.py {id} {conquista}")
+        system(f"python3 scripts/conquistas.py {id} {conquista} {pontos}")
         return True
+
+
+def conquistado(nome, pontos, descript):
+    return f"""[c]Conquista
+[c]
+[bc]{nome}
+[ci]{descript}
+[cu]+{pontos} pontos"""
 
 
 # Comando simples que manda msg
@@ -63,12 +71,8 @@ def ola(data):
 # !help
 @client.command("help")
 def ajuda(data):
-    if conquista(data.authorId, "ajuda_caralho"):
-        data.subClient.send_message(data.chatId, f"""[c]Conquista
-[c]
-[bc]Ajuda caralho
-[ci]Digite !help pela primeira vez
-[cu]+100 pontos""")
+    if conquista(data.authorId, "ajuda_caralho", 100):
+        data.subClient.send_message(data.chatId, conquistado("Ajuda caralho!", 100, "Digite !help pela primeira vez"))
     # Ele verifica a página pedida e então mostra os comandos
     if data.message == "1":
         data.subClient.send_message(data.chatId, esteticabase("help", """
@@ -138,6 +142,9 @@ def ship(data):
     # e então joga tudo para letras minusculas e por fim capitalizando a primeira letra
     shippname = ((''.join(shippname)).lower()).capitalize()
 
+    if shippname.lower() in ["gumwin", "darall"]:
+        if conquista(data.authorId, "incesto", 50):
+            data.subClient.send_message(data.chatId, conquistado("Eca, incesto", 50, "Ewww..."))
     # Frases, peguei do antigo
     mtruim = ["Mt meloso, eca", "Eles são irmãos, e isso é nojento...", "Eles se odeiam...", "Meh.",
               "Queria muito que isso desse certo, mas nunca vai dar certo.",
@@ -401,9 +408,30 @@ def teste(data):
 @client.command("pontos")
 def points(data):
     # Olha a quantidades de pontos
-    pontos = ''.join(open(f"pontos/{data.authorId}", "r").readlines())
+    pontos = load(open(f"info/{data.authorId}.json", "r"))
+    pontos = str(pontos["points"])
     
     data.subClient.send_message(data.chatId, pontos)
+
+
+# !conquistas
+@client.command("conquistas")
+def conquistas(data):
+    # Loda o arquivo JSON
+    conq = load(open(f"info/{data.authorId}.json", "r"))
+    conqs = conq["achievements"]
+    conqsform = []
+
+    # Faz as conquistas ficarem formatadas
+    for l in range(0, len(conqs)):
+        conqsform.append((conqs[l].replace("_", " ")).capitalize())
+    conqsform = "\n[c]".join(conqsform)
+
+    # Manda as conquistas
+    data.subClient.send_message(data.chatId, esteticabase("Conquistas", 
+    f"""
+[c]
+[c]{conqsform}""", f"Conquistas de {data.author}"))
 
 
 client.launch()
