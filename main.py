@@ -495,9 +495,9 @@ def claim(args):
 
 
 # !musica
-@client.command("musica")
-def chamada(data):
-    client.play(data.chatId, data.comId, data.message)
+#@client.command("musica")
+#def chamada(data):
+#    client.play(data.chatId, data.comId, data.message)
 
 
 client.launch()
