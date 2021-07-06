@@ -454,12 +454,12 @@ def votar(data):
     args = (data.message).split(";")
     # Cria uma eqnuete com pollid
     if args[0] == "criar":
-        pollid = randint(0, 9999)
+        pollid = ((args[1]).strip(" ")).replace(" ", "_")
         # Arquivos JSON não suportam espaços
         for l in range(0, len(args[1:])):
             args[l+1] = (args[l+1].strip(" ")).replace(" ", "_")
 
-        system(f"python3 scripts/polls.py criar {pollid} {' '.join(args[1:])}")
+        system(f"python3 scripts/polls.py criar {pollid} {' '.join(args[2:])}")
         data.subClient.send_message(data.chatId, f"Criada uma enquete com o ID '{pollid}'")
     elif args[0] == "votar":
         args[2] = (args[2].strip(" ")).replace(" ", "_")
@@ -473,7 +473,7 @@ def votar(data):
             jvalues.append(f"\n[c]{k}: {v}")
         
         # Mostra os resultados
-        data.subClient.send_message(data.chatId, esteticabase("Enquete", f"{''.join(jvalues)}", "Resultados"))
+        data.subClient.send_message(data.chatId, esteticabase("Enquete", f"{''.join(jvalues)}", f"{((args[1].strip(' ')).replace('_', ' ')).capitalize()}"))
 
 
 # !claim (comando pegado e adaptado o servidor do discord do Phoenix)
@@ -491,7 +491,12 @@ def claim(args):
     elif args.message == "ver":
         args.subClient.send_message(args.chatId, f"Você pode pegar {jclaims['claims']*10} acs.")
     else:
-        args.subClient.send_message(args.chatId, "Erro!")
+        if jclaims["claims"] < 1:
+            args.subClient.send_message(args.chatId, f"Sem claim points suficientes! Você possui {jclaims['claims']} de 1 necessário")
+        elif coins < 1:
+            args.subClient.send_message(args.chatId, f"Conta vazia :(")
+        else:
+            args.subClient.send_message(args.chatId, "Erro!")
 
 
 # !musica
