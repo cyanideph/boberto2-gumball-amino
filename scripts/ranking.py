@@ -5,7 +5,7 @@ from json import dumps, load
 try:
     open(f"info/{args[1]}.json")
 except FileNotFoundError:
-    open(f"info/{args[1]}.json", "w+").write("{}")
+    open(f"info/{args[1]}.json", "w+").write('{"type": "normal"}')
 
 userjson = load(open(f"info/{args[1]}.json", "r"))
 try:

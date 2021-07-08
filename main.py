@@ -62,6 +62,18 @@ def conquistado(nome, pontos, descript):
 [cu]+{pontos} pontos"""
 
 
+def éDaStaff(authid):
+    system(f"python3 scripts/ranking.py {authid} ! 0")
+    jinfo = load(open(f"info/{authid}.json", "r"))
+    if jinfo["type"] == "staff":
+        try:
+            return jinfo["staff_type"]
+        except KeyError:
+            return "leader"
+    else:
+        return False
+
+
 # Comando simples que manda msg
 @client.command("hello")
 def ola(data):
@@ -106,12 +118,17 @@ def ajuda(data):
         data.subClient.send_message(data.chatId, esteticabase("help", """
 [c] Modos:
 [c]    criar - cria uma enquete
-[c]       Argumentos: !vote criar; opção 1; opção 2; etc...
+[c]       Argumentos: !vote criar; Nome da enquete; opção 1; opção 2; etc...
 [c]     votar - vota numa enquete
 [c]         Argumentos: !vote votar; id; opção
 [c]     ver - vê os resultados da enquete
 [c]         Argumentos !vote ver; id
         """, "Vote"))
+    elif data.message == "mod":
+        data.subClient.send_message(data.chatId, esteticabase("Mod", """
+[c] !tag [@user] - Dá tag a um usuário
+[c] !op [role, @user] - Dá um titulo para um usuário (VALIDO APENAS PARA O BOT)
+        """, "  Mod"))
     else:
         data.subClient.send_message(data.chatId, "Digite o número da página. (Total de páginas: 2)")
 
@@ -417,7 +434,6 @@ def teste(data):
         os.system("python3 scripts/filewriter.py")
         data.subClient.send_message(data.chatId, str(''.join(open("scripts/file", "r").readlines())))
 
-
 # !pontos
 @client.command("pontos")
 def points(data):
@@ -481,9 +497,11 @@ def votar(data):
 def claim(args):
     jclaims = load(open(f"info/{args.authorId}.json", "r"))
     
+    blogs = args.subClient.get_user_blogs(args.authorId).blogId
+
     coins = args.subClient.get_wallet_amount()
-    if coins >= 1 and jclaims["claims"] >= 1 and args.message == "claim":
-        args.subClient.pay(int(jclaims["claims"])*10, chatId=args.chatId)
+    if coins >= 1 and jclaims["claims"] >= 0.1 and args.message == "claim":
+        args.subClient.pay(int(jclaims["claims"]*10), blogId=blogs[0])
         args.subClient.send_message(args.chatId, "Enviado!")
         if conquista(args.authorId, "o_capitalista", 1000):
             args.subClient.send_message(args.chatId, conquistado("O capitalista", 1000, "Dê !claim e ganhe acs pela primeira vez."))
@@ -503,6 +521,32 @@ def claim(args):
 #@client.command("musica")
 #def chamada(data):
 #    client.play(data.chatId, data.comId, data.message)
+
+
+# !tag
+@client.command("tag")
+def titulo(data):
+    if not éDaStaff(data.authorId):
+        return False
+    mention = data.subClient.get_message_info(chatId=data.chatId, messageId=data.messageId).mentionUserIds
+    data.subClient.add_title(mention[0], ' '.join((data.message).split(" ")[1:]))
+    data.subClient.send_message(data.chatId, "Pronto.")
+
+
+# !op
+@client.command("op")
+def op(data):
+    staff = éDaStaff(data.authorId)
+    if not staff:
+        return False
+    else:
+        if staff != "leader":
+            return False
+
+    mention = data.subClient.get_message_info(chatId=data.chatId, messageId=data.messageId).mentionUserIds
+    for l in mention:
+        system(f"python3 scripts/op.py {l} {(data.message).split(' ')[0]}")
+    data.subClient.send_message(data.chatId, f"Dado op para os usuarios mencionados")
 
 
 client.launch()
