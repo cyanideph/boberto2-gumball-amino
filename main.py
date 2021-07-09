@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-# -*- coding: utf-8 -*-
 from amino.lib.util import exceptions
 from BotAmino import *
 from random import *
@@ -5,7 +6,8 @@ from time import *
 from gtts import gTTS, lang
 import os
 import wikipedia
-import json
+from json import load
+import amino
 
 print("Iniciando...")
 
@@ -66,10 +68,7 @@ def éDaStaff(authid):
     system(f"python3 scripts/ranking.py {authid} ! 0")
     jinfo = load(open(f"info/{authid}.json", "r"))
     if jinfo["type"] == "staff":
-        try:
-            return jinfo["staff_type"]
-        except KeyError:
-            return "leader"
+        return jinfo["staff_type"]
     else:
         return False
 
@@ -127,7 +126,12 @@ def ajuda(data):
     elif data.message == "mod":
         data.subClient.send_message(data.chatId, esteticabase("Mod", """
 [c] !tag [@user] - Dá tag a um usuário
-[c] !op [role, @user] - Dá um titulo para um usuário (VALIDO APENAS PARA O BOT)
+[c] !op [role, @users] - Dá um titulo para um usuário (VALIDO APENAS PARA O BOT)
+[c] !deop [@users] - Tira o op de um usuário
+[c] !ban [@user, motivo] - Bane alguém
+[c] !strike [@user, motivo] - Dá um castigo de 24hrs para alguém
+[c] !avisar [@user, motivo] - Manda um aviso
+[c] !end - Desliga o bot
         """, "  Mod"))
     else:
         data.subClient.send_message(data.chatId, "Digite o número da página. (Total de páginas: 2)")
@@ -547,6 +551,48 @@ def op(data):
     for l in mention:
         system(f"python3 scripts/op.py {l} {(data.message).split(' ')[0]}")
     data.subClient.send_message(data.chatId, f"Dado op para os usuarios mencionados")
+
+
+@client.command("ban")
+def banir(data):
+    staffstatus = éDaStaff(data.authorId)
+    if staffstatus:
+        if staffstatus == "leader":
+            mention = data.subClient.get_message_info(chatId=data.chatId, messageId=data.messageId).mentionUserIds
+            data.subClient.ban(mention[0], reason=" ".join(data.message.split(' ')[1:]), banType=0)
+            data.subClient.send_message(data.chatId, f"Usuário banido com sucesso!")
+
+
+@client.command("end")
+def exit(data):
+    if éDaStaff(data.authorId):
+        os._exit(1)
+
+
+@client.command("strike")
+def castigar(data):
+    staff = éDaStaff(data.authorId)
+    if staff:
+        if staff in ["leader", "curator"]:
+            args = (data.message).split(" ")
+            mention = data.subClient.get_message_info(chatId=data.chatId, messageId=data.messageId).mentionUserIds
+            data.subClient.strike(userId=mention[0], time=5, title=' '.join(args[1:]))
+
+
+@client.command("avisar")
+def avisar(data):
+    if éDaStaff(data.authorId):
+        mention = data.subClient.get_message_info(chatId=data.chatId, messageId=data.messageId).mentionUserIds
+        data.subClient.warn(mention[0], f"{' '.join(data.message.split(' ')[1:])}")
+
+
+@client.command("deop")
+def deop(data):
+    if data.authorId == "2ddaa4b1-8562-45c4-a87e-e494ac4c291d":
+        mention = data.subClient.get_message_info(chatId=data.chatId, messageId=data.messageId).mentionUserIds
+        for l in mention:
+            system(f"python3 scripts/deop.py {l}")
+        data.subClient.send_message(data.chatId, "Tirado o op dos usuários mencionados")
 
 
 client.launch()
