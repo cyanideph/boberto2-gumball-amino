@@ -1,4 +1,3 @@
-import json
 from sys import argv as args
 from json import load, dumps
 

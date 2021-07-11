@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-# -*- coding: utf-8 -*-
-from amino.lib.util import exceptions
 from BotAmino import *
 from random import *
 from time import *
-from gtts import gTTS, lang
+from gtts import gTTS
 import os
 import wikipedia
 from json import load
-import amino
 
 print("Iniciando...")
 
@@ -19,12 +17,12 @@ wikipedia.set_lang("pt")
 
 
 # A estética base para as coisas do bot
-def esteticabase(titulo, conteudo, subtitulo=""):
+def esteticabase(t, conteudo, subtitulo=""):
     return f"""
 [c]┏                    ───                      ┓ 
 [C]──   Roberto   ──
 [C]✩✼　｡ﾟ･　　ﾟ･　☆　° ｡ 
-[C] ❤️’• {titulo}
+[C] ❤️’• {t}
 [C]         ╺╺╺╺╺╺╺╺(☕)
 [C] — {subtitulo}
 {conteudo}
@@ -33,18 +31,17 @@ def esteticabase(titulo, conteudo, subtitulo=""):
 
 
 # Sistema de conquistas (a parte do código principal)
-def conquista(id, conquista, pontos):
-
+def conquista(cid, achievement, pontos):
     # Primeiro é rodado para se criar o arquivo JSON se não tiver um
-    system(f"python3 scripts/conquistas.py {id} ignore 0")
+    system(f"python3 scripts/conquistas.py {cid} ignore 0")
 
     # É lodado o arquivo JSON para checar se a conquista já foi conquistada
-    userjson = load(open(f"info/{id}.json", "r"))
-    
+    userjson = load(open(f"info/{cid}.json", "r"))
+
     # É checado
     try:
-        if conquista not in userjson["achievements"]:
-            system(f"python3 scripts/conquistas.py {id} {conquista} {pontos}")
+        if achievement not in userjson["achievements"]:
+            system(f"python3 scripts/conquistas.py {cid} {achievement} {pontos}")
             # Se o usuário não possuir essa conquista é retornado True
             return True
         else:
@@ -52,7 +49,7 @@ def conquista(id, conquista, pontos):
             return False
     except KeyError:
         # Em caso de KeyError, é considerado a conquista como não conquistada
-        system(f"python3 scripts/conquistas.py {id} {conquista} {pontos}")
+        system(f"python3 scripts/conquistas.py {cid} {achievement} {pontos}")
         return True
 
 
@@ -64,7 +61,7 @@ def conquistado(nome, pontos, descript):
 [cu]+{pontos} pontos"""
 
 
-def éDaStaff(authid):
+def edastaff(authid):
     system(f"python3 scripts/ranking.py {authid} ! 0")
     jinfo = load(open(f"info/{authid}.json", "r"))
     if jinfo["type"] == "staff":
@@ -146,33 +143,32 @@ def ship(data):
     # (ou pelo menos era para não ter bugs)
     # No final, o output é assim: [[pessoa1, False], [pessoa2, True]]
     # Cada item representa a pessoa do argumento mais se o tamanho é menor que 3
-    pessoas = (data.message).split(" ")
-    pessoas_preserve = (data.message).split(" ")
-    for l in range(0, 2):
-        if len(pessoas[l]) < 3:
-            pessoas[l] = [pessoas[l], True]
+    pessoas = data.message.split(" ")
+    pessoas_preserve = data.message.split(" ")
+    for loop in range(0, 2):
+        if len(pessoas[loop]) < 3:
+            pessoas[loop] = [pessoas[loop], True]
         else:
-            pessoas[l] = [pessoas[l], False]
-    
+            pessoas[loop] = [pessoas[loop], False]
+
     shippname = []
-    indxlist = []
     # Essa parte é o que define o nome do shipp.
     for index in range(0, 2):
         # Condicional usada para criar o nome do shipp
         if pessoas[index][1]:
             shippname.append(pessoas[index][0])
-       # Se essa condição for negativa, será recortado os 3 caracteres iniciais ou os 3 finais
+        # Se essa condição for negativa, será recortado os 3 caracteres iniciais ou os 3 finais
         else:
             if index == 0:
                 shippname.append(pessoas[index][0][0:3])
             else:
                 reverse = len(pessoas[index][0]) - 4
-                for l in range(0, len(pessoas[index][0])+1):
+                for loop in range(0, len(pessoas[index][0]) + 1):
                     reverse += 1
                     shippname.append(pessoas[index][0][reverse])
-                    if l == 2:
+                    if loop == 2:
                         break
-    
+
     # Pega a lista de caracteres gerados e junta em uma string com o nome do ship
     # e então joga tudo para letras minusculas e por fim capitalizando a primeira letra
     shippname = ((''.join(shippname)).lower()).capitalize()
@@ -189,8 +185,9 @@ def ship(data):
                                                               "são "
                                                               "muito amigos",
           f"{pessoas[0][0]} quer muito ficar com {pessoas[1][0]}, mas {pessoas[1][0]} não quer.", "Não acho que daria "
-                                                                                         "certo, mas sempre tem um "
-                                                                                         "talvez.",
+                                                                                                  "certo, mas sempre"
+                                                                                                  "tem um "
+                                                                                                  "talvez.",
           "Quem sabe um dia?", "Fofinho, mas nah", f"Eles já estão namorando, mas "
                                                    f"{pessoas[randint(0, 1)][0]} não sabe."]
     bom = ["Eles já estão juntos secretamente.", f"Cara, confesso que só não foi 100% pq {pessoas[randint(0, 1)][0]} é "
@@ -223,6 +220,8 @@ def ship(data):
         quote = choice(bom)
     elif 75 <= porcentagem <= 100:
         quote = choice(mtbom)
+    else:
+        quote = "NaN"
 
     # Enviar a mensagem final
     data.subClient.send_message(data.chatId, esteticabase(shippname, f"""   
@@ -238,14 +237,15 @@ def ship(data):
 @client.command("pvp")
 def fight(data):
     # Argumentos
-    args = (data.message).split(" ")
+    args = data.message.split(" ")
     args.append(5)
 
     # Aqui acontece o jogo em si
     score = [0, 0]
     r = 0
-    for l in range(0, int(args[2])):
-        r +=1
+    winner = ""
+    for loop in range(0, int(args[2])):
+        r += 1
         score[0] = score[0] + randint(0, 1)
         score[1] = score[1] + randint(0, 1)
 
@@ -268,8 +268,8 @@ def fight(data):
 # !spam
 @client.command("spam")
 def flood(data):
-    args = (data.message).split(" ")
-    for l in range(0, int(args[0])):
+    args = data.message.split(" ")
+    for loop in range(0, int(args[0])):
         data.subClient.send_message(data.chatId, ' '.join(args[1:]))
         sleep(1)
 
@@ -287,15 +287,21 @@ def cancel(data):
     pessoa = data.message
 
     # Os motivos de cancelamentos estão aqui:
-    data.subClient.send_message(data.chatId, esteticabase(f"Cancelado", subtitulo=f"{pessoa} foi enviado(a) para a prisão após sofrer cancelamento.",
-    conteudo=f"""
+    data.subClient.send_message(data.chatId, esteticabase(f"Cancelado", conteudo=f"""
 [c]
 [c]O motivo é que {pessoa} {choice(['shippou incesto', 'disse que não gosta de gatos', 'a',
-'gosta do Felipe Neto', "não gosta de Gumball", "é o Neymar", "é gado para caralho", "é lindo dms", "gosta de Kpop", 
-"não fez nada", "é comunista", "apoia o anarcocapitalismo", "apoia o narcotráfico", "被中共黑了", "é chato pra krl",
-"odeia cachorros", "assiste boku no hero", "não gosta do Felipe Neto", "dbdzkfhgvkdhf", "é hacker", 
-"gosta do bts", "não gosta do bts", "falou que gosta de gumwin", "é shitposter", "assiste tio orochi", "usa windows", "usa linux",
-"apoia o comunismo", "apoia o monarquismo", "come figado de frango", "eu quero mijar"])}."""))
+                                    'gosta do Felipe Neto', "não gosta de Gumball", "é o Neymar", "é gado para caralho"
+                                                                                     , "é lindo dms", "gosta de Kpop",
+                                    "não fez nada", "é comunista", "apoia o anarcocapitalismo", "apoia o narcotráfico",
+                                    "被中共黑了", "é chato pra krl",
+                                    "odeia cachorros", "assiste boku no hero", "não gosta do Felipe Neto",
+                                    "dbdzkfhgvkdhf",
+                                    "é hacker",
+                                    "gosta do bts", "não gosta do bts", "falou que gosta de gumwin", "é shitposter",
+                                    "assiste tio orochi", "usa windows", "usa linux",
+                                    "apoia o comunismo", "apoia o monarquismo", "come figado de frango",
+                                    "eu quero mijar"])}.""", subtitulo=f"{pessoa} foi enviado(a) para a prisão após "
+                                                                       f"sofrer cancelamento."))
 
 
 # !diga
@@ -312,8 +318,9 @@ def say_something(data):
 @client.command("vsfbot")
 def vsf(data):
     data.subClient.send_message(data.chatId, f"""{choice([
-"vai se fuder", "vai tomar no cu", "vai tu arrombado", "vsf seu humano", "Si yo fuera un rey, serías mi subordinado.",
-"vsf vsf vsf vsf vsf vsf vsf vsf vsf vsf", "vai tu babaca", "vsf ban", "ainnn vsfff bot ainn AinAIn"
+        "vai se fuder", "vai tomar no cu", "vai tu arrombado", "vsf seu humano",
+        "Si yo fuera un rey, serías mi subordinado.",
+        "vsf vsf vsf vsf vsf vsf vsf vsf vsf vsf", "vai tu babaca", "vsf ban", "ainnn vsfff bot ainn AinAIn"
     ])}""")
 
 
@@ -321,17 +328,16 @@ def vsf(data):
 @client.command("kid")
 def kid(data):
     # Primeiro a frase inteira é transformada em lowercase
-    frase = (data.message).lower()
+    frase = data.message.lower()
     frasekid = []
 
     # Logo em seguida, é randomizado o .upper() e adicionado na lista "frasekid"
-    for l in frase:
+    for loop in frase:
         kiddy = randint(0, 1)
         if kiddy == 0:
-            l = l.upper()
-        
-        frasekid.append(l)
+            loop = loop.upper()
 
+        frasekid.append(loop)
 
     data.subClient.send_message(data.chatId, "".join(frasekid))
 
@@ -339,11 +345,11 @@ def kid(data):
 # !sorteio
 @client.command("sorteio")
 def luck(data):
-    args = (data.message).split(";")
-    
+    args = data.message.split(";")
+
     # Primeiro se define o tipo de sorteio
     if args[0] == 'n':
-        
+
         # No caso de sorteios numericos, é usado randint() para sorteiar um numero entre especificados. os ranges 
         # especificados são colocados na lista argx
         argsx = args[1].split(" ")
@@ -352,7 +358,7 @@ def luck(data):
         num = randint(int(argsx[0]), int(argsx[1]))
         data.subClient.send_message(data.chatId, str(num))
     elif args[0] == 'p':
-        
+
         # Mesmo esquema do anterior, só munda a função da bibilioteca random. Isso escolhe nomes em uma lista
         argsx = args[1].split(" ")
         if argsx[0] == "" or argsx[0] == " ":
@@ -370,11 +376,11 @@ def wiki(data):
     except wikipedia.exceptions.DisambiguationError as e:
         # Se cair em uma página de disambiguation, é printado erro
         may_referir_a = '\n[c]'.join(e.options)
-        data.subClient.send_message(data.chatId, esteticabase("Disambuiguição", f"""[c]{may_referir_a}""", 
-        f"{data.message} pode se referir a: "))
+        data.subClient.send_message(data.chatId, esteticabase("Disambuiguição", f"""[c]{may_referir_a}""",
+                                                              f"{data.message} pode se referir a: "))
         return False
-    wpr = (wp.content).split("\n")
-    
+    wpr = wp.content.split("\n")
+
     # Manda o primeiro paragrafo
     data.subClient.send_message(data.chatId, esteticabase(wp.title, f"""[c]{wpr[0]}
 
@@ -384,36 +390,36 @@ def wiki(data):
 # !quote
 @client.command("quote")
 def fala(data):
-    args = (data.message).split(" ")
+    args = data.message.split(" ")
     if args[0] == 'r':
-        args[0] = choice(["Ednaldo Pereira", "Gumball Watterson", "Darwin Watterson", "Felipe Neto", "Diggo", "Juilo Caesar"
-               , "Aristoceles", "Isaac Newton", "Albert Einsten", "Joseph Stalin", "Vladmir Putin", "Karl Marx"
-               , "Vladmir Lenin", "Jesus Cristo", "Mark Zuckerberg", "Bill Gates", "Steve Jobs", "Autor Desconhecido",
-               "Dom Pedro II do Brasil", "Dom Pedro I do Brasil", "Pitagoras", "Galileu Galileu", "Pedro"
-               , "Stephen Hawking"])
+        args[0] = choice(
+            ["Ednaldo Pereira", "Gumball Watterson", "Darwin Watterson", "Felipe Neto", "Diggo", "Juilo Caesar",
+                "Aristoceles", "Isaac Newton", "Albert Einsten", "Joseph Stalin", "Vladmir Putin", "Karl Marx",
+                "Vladmir Lenin", "Jesus Cristo", "Mark Zuckerberg", "Bill Gates", "Steve Jobs", "Autor Desconhecido",
+             "Dom Pedro II do Brasil", "Dom Pedro I do Brasil", "Pitagoras", "Galileu Galileu", "Pedro",
+                "Stephen Hawking"])
     data.subClient.send_message(data.chatId, f"[cui]{' '.join(args[1:])} ~{args[0]}")
 
 
 # !8ball (Inspirado na Kotomi)
 @client.command("8ball")
 def kotomi_8ball(data):
-    
     # Bloqueia algumas palavras chaves
-    blocklist = ["nazi", "nazista", "nazismo", "homofobia", "homofóbico", "racismo", 
-    "racista", "fascista", "fascismo", "n4z1st4", "n4z1sm0", "n4z1", "preconceito", 
-    "preconceituoso", "xenofobia", "xenofobico", "xenofóbico", "homofobico"]
-    for l in ((data.message).replace("?", "")).split(" "):
-        if l.lower() in blocklist:
-            
+    blocklist = ["nazi", "nazista", "nazismo", "homofobia", "homofóbico", "racismo",
+                 "racista", "fascista", "fascismo", "n4z1st4", "n4z1sm0", "n4z1", "preconceito",
+                 "preconceituoso", "xenofobia", "xenofobico", "xenofóbico", "homofobico"]
+    for loop in (data.message.replace("?", "")).split(" "):
+        if loop.lower() in blocklist:
             # Fala que não vai responder caso alguma palavra esteja na lista de palavras chaves
             data.subClient.send_message(data.chatId, "Não vou responder a isso.")
             return False
 
     # Manda a resposta
-    data.subClient.send_message(data.chatId, choice(["Não", "Sim", "Claro que não", 
-    "Claro que sim", "Não KKKK lol xD", "Talvez, quem sabe?", "será?", 
-    "Nunca", "Isso se quer é uma pergunta?", "Nem fudendo", "Óbvio",
-    "MAS É CLARO", "Uhum", "Lógico que não '-'", "Lógico", "Talvez sim, talvez não."]))
+    data.subClient.send_message(data.chatId, choice(["Não", "Sim", "Claro que não",
+                                                     "Claro que sim", "Não KKKK lol xD", "Talvez, quem sabe?", "será?",
+                                                     "Nunca", "Isso se quer é uma pergunta?", "Nem fudendo", "Óbvio",
+                                                     "MAS É CLARO", "Uhum", "Lógico que não '-'", "Lógico",
+                                                     "Talvez sim, talvez não."]))
 
 
 # !compatibilidade
@@ -426,9 +432,8 @@ def kotomi_compatibilidad(data):
     data.subClient.send_message(data.chatId, esteticabase("Compatibilidade", f"""
 [c] As chances de {data.author} e {data.message} combinarem são de {porcentagem}%
 [c]
-[c][{"█"*int(porcentagem/5)}{"⠀"*int(resto/5)}]
-    """, 
-    f"{data.message} x {data.author}"))
+[c][{"█" * int(porcentagem / 5)}{"⠀" * int(resto / 5)}]
+    """, f"{data.message} x {data.author}"))
 
 
 # Isso aqui é só pra testar, ignorar
@@ -438,13 +443,14 @@ def teste(data):
         os.system("python3 scripts/filewriter.py")
         data.subClient.send_message(data.chatId, str(''.join(open("scripts/file", "r").readlines())))
 
+
 # !pontos
 @client.command("pontos")
 def points(data):
     # Olha a quantidades de pontos
     pontos = load(open(f"info/{data.authorId}.json", "r"))
     pontos = str(pontos["points"])
-    
+
     data.subClient.send_message(data.chatId, pontos)
 
 
@@ -457,13 +463,12 @@ def conquistas(data):
     conqsform = []
 
     # Faz as conquistas ficarem formatadas
-    for l in range(0, len(conqs)):
-        conqsform.append((conqs[l].replace("_", " ")).capitalize())
+    for loop in range(0, len(conqs)):
+        conqsform.append((conqs[loop].replace("_", " ")).capitalize())
     conqsform = "\n[c]".join(conqsform)
 
     # Manda as conquistas
-    data.subClient.send_message(data.chatId, esteticabase("Conquistas", 
-    f"""
+    data.subClient.send_message(data.chatId, esteticabase("Conquistas", f"""
 [c]
 [c]{conqsform}""", f"Conquistas de {data.author}"))
 
@@ -471,13 +476,13 @@ def conquistas(data):
 # !vote
 @client.command("vote")
 def votar(data):
-    args = (data.message).split(";")
+    args = data.message.split(";")
     # Cria uma eqnuete com pollid
     if args[0] == "criar":
         pollid = ((args[1]).strip(" ")).replace(" ", "_")
         # Arquivos JSON não suportam espaços
-        for l in range(0, len(args[1:])):
-            args[l+1] = (args[l+1].strip(" ")).replace(" ", "_")
+        for loop in range(0, len(args[1:])):
+            args[loop + 1] = (args[loop + 1].strip(" ")).replace(" ", "_")
 
         system(f"python3 scripts/polls.py criar {pollid} {' '.join(args[2:])}")
         data.subClient.send_message(data.chatId, f"Criada uma enquete com o ID '{pollid}'")
@@ -491,27 +496,30 @@ def votar(data):
         jvalues = []
         for k, v in polljson.items():
             jvalues.append(f"\n[c]{k}: {v}")
-        
+
         # Mostra os resultados
-        data.subClient.send_message(data.chatId, esteticabase("Enquete", f"{''.join(jvalues)}", f"{((args[1].strip(' ')).replace('_', ' ')).capitalize()}"))
+        data.subClient.send_message(data.chatId, esteticabase("Enquete", f"{''.join(jvalues)}",
+                                                              f"{((args[1].strip(' ')).replace('_', ' ')).capitalize()}"
+                                                              f""))
 
 
 # !claim (comando pegado e adaptado o servidor do discord do Phoenix)
 @client.command("claim")
 def claim(args):
     jclaims = load(open(f"info/{args.authorId}.json", "r"))
-    
+
     blogs = args.subClient.get_user_blogs(args.authorId).blogId
 
     coins = args.subClient.get_wallet_amount()
     if coins >= 1 and jclaims["claims"] >= 0.1 and args.message == "claim":
-        args.subClient.pay(int(jclaims["claims"]*10), blogId=blogs[0])
+        args.subClient.pay(int(jclaims["claims"] * 10), blogId=blogs[0])
         args.subClient.send_message(args.chatId, "Enviado!")
         if conquista(args.authorId, "o_capitalista", 1000):
-            args.subClient.send_message(args.chatId, conquistado("O capitalista", 1000, "Dê !claim e ganhe acs pela primeira vez."))
-        system(f"python3 scripts/ranking.py {args.authorId} ! {jclaims['claims']*1000}")
+            args.subClient.send_message(args.chatId,
+                                        conquistado("O capitalista", 1000, "Dê !claim e ganhe acs pela primeira vez."))
+        system(f"python3 scripts/ranking.py {args.authorId} ! {jclaims['claims'] * 1000}")
     elif args.message == "ver":
-        args.subClient.send_message(args.chatId, f"Você pode pegar {jclaims['claims']*10} acs.")
+        args.subClient.send_message(args.chatId, f"Você pode pegar {jclaims['claims'] * 10} acs.")
     else:
         if coins < 1:
             args.subClient.send_message(args.chatId, f"Conta vazia :(")
@@ -520,25 +528,25 @@ def claim(args):
 
 
 # !musica
-#@client.command("musica")
-#def chamada(data):
+# @client.command("musica")
+# def chamada(data):
 #    client.play(data.chatId, data.comId, data.message)
 
 
 # !tag
 @client.command("tag")
 def titulo(data):
-    if not éDaStaff(data.authorId):
+    if not edastaff(data.authorId):
         return False
     mention = data.subClient.get_message_info(chatId=data.chatId, messageId=data.messageId).mentionUserIds
-    data.subClient.add_title(mention[0], ' '.join((data.message).split(" ")[1:]))
+    data.subClient.add_title(mention[0], ' '.join(data.message.split(" ")[1:]))
     data.subClient.send_message(data.chatId, "Pronto.")
 
 
 # !op
 @client.command("op")
 def op(data):
-    staff = éDaStaff(data.authorId)
+    staff = edastaff(data.authorId)
     if not staff:
         return False
     else:
@@ -546,14 +554,14 @@ def op(data):
             return False
 
     mention = data.subClient.get_message_info(chatId=data.chatId, messageId=data.messageId).mentionUserIds
-    for l in mention:
-        system(f"python3 scripts/op.py {l} {(data.message).split(' ')[0]}")
+    for loop in mention:
+        system(f"python3 scripts/op.py {loop} {data.message.split(' ')[0]}")
     data.subClient.send_message(data.chatId, f"Dado op para os usuarios mencionados")
 
 
 @client.command("ban")
 def banir(data):
-    staffstatus = éDaStaff(data.authorId)
+    staffstatus = edastaff(data.authorId)
     if staffstatus:
         if staffstatus == "leader":
             mention = data.subClient.get_message_info(chatId=data.chatId, messageId=data.messageId).mentionUserIds
@@ -562,24 +570,24 @@ def banir(data):
 
 
 @client.command("end")
-def exit(data):
-    if éDaStaff(data.authorId):
+def botexit(data):
+    if edastaff(data.authorId):
         os._exit(1)
 
 
 @client.command("strike")
 def castigar(data):
-    staff = éDaStaff(data.authorId)
+    staff = edastaff(data.authorId)
     if staff:
         if staff in ["leader", "curator"]:
-            args = (data.message).split(" ")
+            args = data.message.split(" ")
             mention = data.subClient.get_message_info(chatId=data.chatId, messageId=data.messageId).mentionUserIds
             data.subClient.strike(userId=mention[0], time=5, title=' '.join(args[1:]))
 
 
 @client.command("avisar")
 def avisar(data):
-    if éDaStaff(data.authorId):
+    if edastaff(data.authorId):
         mention = data.subClient.get_message_info(chatId=data.chatId, messageId=data.messageId).mentionUserIds
         data.subClient.warn(mention[0], f"{' '.join(data.message.split(' ')[1:])}")
 
@@ -588,33 +596,33 @@ def avisar(data):
 def deop(data):
     if data.authorId == "2ddaa4b1-8562-45c4-a87e-e494ac4c291d":
         mention = data.subClient.get_message_info(chatId=data.chatId, messageId=data.messageId).mentionUserIds
-        for l in mention:
-            system(f"python3 scripts/deop.py {l}")
+        for loop in mention:
+            system(f"python3 scripts/deop.py {loop}")
         data.subClient.send_message(data.chatId, "Tirado o op dos usuários mencionados")
 
 
-@client.command("info")
+@client.command("information")
 def info(data):
     mention = data.subClient.get_message_info(chatId=data.chatId, messageId=data.messageId).mentionUserIds
     if type(mention) == NoneType:
         user = load(open(f"info/{data.authorId}.json", "r"))
-        info = []
+        information = []
         for key, value in user.items():
-            info.append(f"{key}: {value}")
-        data.subClient.send_message(data.chatId, "\n".join(info))
+            information.append(f"{key}: {value}")
+        data.subClient.send_message(data.chatId, "\n".join(information))
     else:
-        for l in mention:
+        for loop in mention:
             try:
-                user = load(open(f"info/{l}.json", "r"))
+                user = load(open(f"info/{loop}.json", "r"))
             except FileNotFoundError:
                 user = {
-                    "nodata" : "nodata"
+                    "nodata": "nodata"
                 }
-            info = []
+            information = []
             for key, value in user.items():
-                info.append(f"{key}: {value}")
+                information.append(f"{key}: {value}")
             sleep(0.5)
-            data.subClient.send_message(data.chatId, "\n".join(info))
+            data.subClient.send_message(data.chatId, "\n".join(information))
 
 
 client.launch()

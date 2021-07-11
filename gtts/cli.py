@@ -96,7 +96,7 @@ def print_languages(ctx, param, value):
     except RuntimeError as e:  # pragma: no cover
         log.debug(str(e), exc_info=True)
         raise click.ClickException("Couldn't fetch language list.")
-    ctx.exit()
+    ctx.botexit()
 
 
 def set_debug(ctx, param, debug):

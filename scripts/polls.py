@@ -1,5 +1,4 @@
 from json import load, dumps
-import json
 from sys import argv as args
 
 # Cria uma enquete
