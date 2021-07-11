@@ -513,12 +513,10 @@ def claim(args):
     elif args.message == "ver":
         args.subClient.send_message(args.chatId, f"Você pode pegar {jclaims['claims']*10} acs.")
     else:
-        if jclaims["claims"] < 1:
-            args.subClient.send_message(args.chatId, f"Sem claim points suficientes! Você possui {jclaims['claims']} de 1 necessário")
-        elif coins < 1:
+        if coins < 1:
             args.subClient.send_message(args.chatId, f"Conta vazia :(")
         else:
-            args.subClient.send_message(args.chatId, "Erro!")
+            args.subClient.send_message(args.chatId, "Erro! Você só pode claimar apartir de 1 AC!")
 
 
 # !musica
@@ -593,6 +591,30 @@ def deop(data):
         for l in mention:
             system(f"python3 scripts/deop.py {l}")
         data.subClient.send_message(data.chatId, "Tirado o op dos usuários mencionados")
+
+
+@client.command("info")
+def info(data):
+    mention = data.subClient.get_message_info(chatId=data.chatId, messageId=data.messageId).mentionUserIds
+    if type(mention) == NoneType:
+        user = load(open(f"info/{data.authorId}.json", "r"))
+        info = []
+        for key, value in user.items():
+            info.append(f"{key}: {value}")
+        data.subClient.send_message(data.chatId, "\n".join(info))
+    else:
+        for l in mention:
+            try:
+                user = load(open(f"info/{l}.json", "r"))
+            except FileNotFoundError:
+                user = {
+                    "nodata" : "nodata"
+                }
+            info = []
+            for key, value in user.items():
+                info.append(f"{key}: {value}")
+            sleep(0.5)
+            data.subClient.send_message(data.chatId, "\n".join(info))
 
 
 client.launch()
