@@ -625,5 +625,29 @@ def info(data):
             data.subClient.send_message(data.chatId, "\n".join(information))
 
 
+@client.command("forca")
+def f(data):
+    os.system(f"python3 scripts/forca.py {data.authorId} {data.message}")
+    
+    try:
+        sinfo = load(open(f"info/forca/{data.authorId}.json", "r"))
+    except FileNotFoundError:
+        data.subClient.send_message(data.chatId, f"!f play para começar a jogar.")
+    if sinfo["gamestatus"] == "defeat":
+        data.subClient.send_message(data.chatId, f"""[bc]DERROTA!
+[cu]A palavra era "{sinfo["word"]}"!
+        """)
+        if conquista(data.authorId, "derrota_forca", 1000):
+            data.subClient.send_message(data.chatId, conquistado("Perda em forca", 1000, "Perca em forca"))
+    elif sinfo["gamestatus"] == "victory":
+        if conquista(data.authorId, "vitoria_forca", 5000):
+            data.subClient.send_message(data.chatId, conquistado("Vitória", 5000, "Ganhe em forca."))
+        data.subClient.send_message(data.chatId, f"""[bc]Vitória!
+[cu]Parabéns!
+        """)
+    else:
+        data.subClient.send_message(data.chatId, esteticabase(f"Forca", f"[c]{sinfo['playerview'].replace('', ' ')}", f"{len(sinfo['word'])} letras, {sinfo['tries']} tentativas."))
+
+
 client.launch()
 print("pronto")
