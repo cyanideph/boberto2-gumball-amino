@@ -1,14 +1,17 @@
 {
-    "word": "eletronica",
-    "gamestatus": "victory",
+    "word": "irma",
+    "gamestatus": "ongoing",
     "letters": [
         "a",
         "e",
         "i",
         "o",
         "u",
-        "l"
+        "n",
+        "t",
+        "h",
+        "s"
     ],
-    "playerview": "ele__o_i_a",
-    "tries": 9
+    "playerview": "i__a",
+    "tries": 3
 }

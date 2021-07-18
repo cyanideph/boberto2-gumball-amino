@@ -627,7 +627,14 @@ def info(data):
 
 @client.command("forca")
 def f(data):
-    os.system(f"python3 scripts/forca.py {data.authorId} {data.message}")
+    if data.message.split(" ")[0] != "play":
+        os.system(f"python3 scripts/forca.py {data.authorId} {data.message}")
+    else:
+        splitmsg = data.message.split(" ")
+        try:
+            os.system(f"python3 scripts/forca.py {data.authorId} {splitmsg[0]} {splitmsg[1]}")
+        except IndexError:
+            os.system(f"python3 scripts/forca.py {data.authorId} {splitmsg[0]} easy")
     
     try:
         sinfo = load(open(f"info/forca/{data.authorId}.json", "r"))
@@ -646,8 +653,9 @@ def f(data):
 [cu]Parabéns!
         """)
     else:
-        data.subClient.send_message(data.chatId, esteticabase(f"Forca", f"[c]{sinfo['playerview'].replace('', ' ')}", f"{len(sinfo['word'])} letras, {sinfo['tries']} tentativas."))
+        letterset = set(sinfo["letters"])
+        data.subClient.send_message(data.chatId, esteticabase(f"Forca", f"[c]{sinfo['playerview'].replace('', ' ')}\n[c]{' '.join(letterset)}", f"{len(sinfo['word'])} letras, {sinfo['tries']} tentativas."))
 
 
 client.launch()
-print("pronto")
+print("pronto!")

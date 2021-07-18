@@ -297,7 +297,7 @@ seul
 nova iorque
 peru
 chile
-uruguay
+uruguai
 USA
 EUA
 canada

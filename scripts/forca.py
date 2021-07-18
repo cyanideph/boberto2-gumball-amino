@@ -9,7 +9,10 @@ letrasub = False
 if args[2] != "play":
     game = load(open(f"info/forca/{session}.json", "r"))
 else:
-    wlist = open("scripts/palavras/palavras.txt", "r").readlines()
+    if args[3].lower() in ["hard", "h"]:
+        wlist = open("scripts/palavras/palavras2.txt", "r").readlines()
+    else:
+         wlist = open("scripts/palavras/palavras.txt", "r").readlines()
     wordlist = []
     for indx in wlist:
         indx = (indx.lower()).replace("\n", "")
